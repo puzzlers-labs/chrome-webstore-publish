@@ -11,7 +11,7 @@
 
   // Prettier Configuration
   // Points to the JavaScript config file for inline comments and advanced settings
-  "prettier.configPath": "prettier.config.js",
+  "prettier.configPath": ".prettierrc",
 
   // Problem Panel Visibility Control
   // Hides the Problems panel to reduce distractions during documentation work
