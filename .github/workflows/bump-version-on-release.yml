@@ -1,3 +1,9 @@
+# This workflow automatically bumps the package version in package.json when a new release is published.
+# It runs on release events, extracts the version from the release tag, updates package.json, and commits the change.
+# The workflow uses Node.js and pnpm for version management and package handling.
+# The commit is pushed with a bot user to keep versioning in sync with releases.
+# This ensures that the package.json version always matches the latest release tag.
+
 name: Bump package version on release
 
 on:
@@ -8,17 +14,13 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     steps:
-      # ----------------------------------------------
-      # 1. Checkout repository
-      # ----------------------------------------------
+      # Checks out the repository so workflow can access and modify files.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed to push tag for release
 
-      # ----------------------------------------------
-      # 2. Determine version from release tag
-      # ----------------------------------------------
+      # Extracts the version number from the release tag and makes it available for later steps.
       - name: Determine target version
         id: get_version
         run: |
@@ -26,32 +28,24 @@ jobs:
           clean_version=${version#v}  # strip leading v
           echo "RELEASE_VERSION=$clean_version" >> "$GITHUB_OUTPUT"
 
-      # ----------------------------------------------
-      # 3. Set up Node.js
-      # ----------------------------------------------
+      # Sets up the specified Node.js version for running scripts and pnpm.
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # ----------------------------------------------
-      # 4. Setup pnpm
-      # ----------------------------------------------
+      # Installs the latest version of pnpm for package management.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
 
-      # ----------------------------------------------
-      # 5. Bump package.json version
-      # ----------------------------------------------
+      # Updates the version in package.json to match the release version, without creating a git tag.
       - name: Bump package.json version
         run: |
           pnpm version --no-git-tag-version "$RELEASE_VERSION"
 
-      # ----------------------------------------------
-      # 6. Commit and push version bump
-      # ----------------------------------------------
+      # Commits the updated package.json and pushes the change using a bot account.
       - name: Commit and push version bump
         run: |
           git config user.name "puzzlers-tech[bot]"
