@@ -1,0 +1,15 @@
+# This file tells Docker which files and directories to ignore when building the image.
+# Ignoring dependencies, git, editor, and config files to keep the image clean and small.
+# - node_modules: Exclude installed dependencies
+# - .git, .github: Exclude git and GitHub config/history
+# - .vscode: Exclude editor settings
+# - Dockerfile, README.md, action.yml, pnpm-lock.yaml, temp.txt: Exclude build/config/docs not needed in the image
+node_modules
+.git
+.github
+.vscode
+Dockerfile
+README.md
+action.yml
+pnpm-lock.yaml
+temp.txt
