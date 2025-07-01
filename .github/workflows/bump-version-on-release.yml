@@ -45,6 +45,20 @@ jobs:
         run: |
           pnpm version --no-git-tag-version "$RELEASE_VERSION"
 
+      # Logs in to GitHub Container Registry (GHCR) using the GitHub Actions token.
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Builds the Docker image and tags it with the release version.
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.RELEASE_VERSION }} .
+
+      # Pushes the Docker image to GHCR.
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.RELEASE_VERSION }}
+
       # Commits the updated package.json and pushes the change using a bot account.
       - name: Commit and push version bump
         run: |
