@@ -1,46 +1,48 @@
 {
-  // VSCode Settings Configuration
-  // Optimizes the development environment for Prettier formatting and performance enhancements
+  // VSCode workspace settings for consistent formatting, performance, and development experience.
+  // Configures Prettier, editor behavior, whitespace handling, search, and file watching for this project.
+  // Settings are tailored for cross-platform compatibility and distraction-free documentation work.
 
-  // Essential Editor Configuration
-  // Sets up consistent formatting and editing behavior across the project
+  // Editor Configuration
+  // Controls indentation, formatting, and default formatter
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   // Prettier Configuration
-  // Points to the JavaScript config file for inline comments and advanced settings
+  // Specifies the Prettier configuration file.
   "prettier.configPath": ".prettierrc",
+  // Specifies files and folders for Prettier to ignore
+  "prettier.ignorePath": ".prettierignore",
 
-  // Problem Panel Visibility Control
-  // Hides the Problems panel to reduce distractions during documentation work
+  // Problem Panel Visibility
+  // Hides the Problems panel for a cleaner workspace
   "problems.visibility": false,
 
-  // Trailing Spaces Configuration (Essential Extension)
-  // Automatically removes trailing whitespace and highlights it for clean commits
+  // Trailing Spaces Handling
+  // Removes trailing whitespace on save and highlights it for review
   "trailing-spaces.trimOnSave": true,
   "trailing-spaces.includeEmptyLines": true,
   "trailing-spaces.highlightCurrentLine": true,
   "trailing-spaces.backgroundColor": "rgba(255,0,0,0.15)",
   "trailing-spaces.borderColor": "rgba(255,100,100,0.3)",
 
-  // Performance Optimizations
-  // Excludes large directories from search to improve VSCode responsiveness
+  // Search Performance
+  // Excludes specified folders/files from search for better performance
   "search.exclude": {
     "**/node_modules": true,
     "**/.git": true,
     "**/pnpm-lock.yaml": true
   },
 
-  // Cross-platform Compatibility
-  // Ensures consistent line endings and auto-save behavior across different operating systems
+  // File Handling
+  // Sets line endings to LF and enables auto-save on focus change
   "files.eol": "\n",
   "files.autoSave": "onFocusChange",
 
   // File Watcher Performance
-  // Prevents VSCode from watching large directories that change frequently
-  // Improves performance and reduces CPU usage during development
+  // Excludes large or frequently changing folders from file watching
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
