@@ -1,0 +1,5 @@
+# This file tells Prettier which files and folders to ignore when formatting code.
+# Files listed here will not be formatted by Prettier.
+
+# Ignore the LICENSE file from formatting.
+LICENSE
