@@ -12,7 +12,6 @@
   "extends": [
     "eslint:recommended",
     "plugin:n/recommended",
-    "plugin:es-x/recommended",
     "plugin:@stylistic/recommended",
     "plugin:import/recommended",
     "plugin:promise/recommended"
@@ -23,7 +22,7 @@
     "sourceType": "module"
   },
   // Registers all plugins
-  "plugins": ["n", "es-x", "@stylistic", "import", "promise"],
+  "plugins": ["n", "@stylistic", "import", "promise"],
   // Custom linting rules for code style and error prevention
   "rules": {
     "semi": ["error", "always"],
