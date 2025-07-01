@@ -1,33 +1,75 @@
-name: 'chrome-webstore-publish'
-description: 'Upload and publish Chrome extension ZIPs to the Chrome Web Store via API.'
-author: 'OSS Community'
+# This file defines a GitHub Action for uploading and publishing Chrome extensions to the Chrome Web Store using the API.
+# It specifies required and optional inputs, Docker-based execution, and branding for the action.
+# The action supports both ZIP and CRX uploads, OAuth2 authentication, and optional expedited review.
+#
+# Inputs section lists all parameters needed for the action, including extension details and authentication.
+# The 'runs' section configures the Docker image and entrypoint for execution.
+# Branding section customizes the action's appearance in the GitHub Actions UI.
+#
+# To use the action, you need to create a Google Cloud project and enable the Chrome Web Store API.
+# Documentation of that can be found here: https://developer.chrome.com/docs/webstore/using-api.
+name: 'Chrome Webstore Publish'
+description: 'Upload and publish Chrome extension ZIPs or CRX to the Chrome Web Store via API.'
+author: 'Puzzlers Labs'
+
 inputs:
+  # The unique ID of the Chrome extension to update or publish.
+  # It is a 32 character hexadecimal string.
   extension_id:
-    description: 'The Chrome Web Store extension ID.'
+    description: 'Chrome Web Store extension ID.'
     required: true
+
+  # Path to the ZIP file of the extension to upload.
   zip_file:
     description: 'Path to the extension ZIP file.'
     required: true
+
+  # OAuth2 client ID for Google Cloud authentication
   client_id:
     description: 'Google Cloud OAuth2 client ID.'
     required: true
+
+  # OAuth2 client secret for Google Cloud authentication
   client_secret:
-    description: 'Google Cloud OAuth2 client secret.'
+    description: 'Google Cloud OAuth2 Client Secret.'
     required: true
+
+  # OAuth2 refresh token for Google Cloud authentication
   refresh_token:
-    description: 'OAuth2 refresh token.'
+    description: 'Google Cloud OAuth2 Refresh Token.'
     required: true
+
+  # Target audience for publishing: public or testers
   publish_target:
-    description: 'Publish target: default (public) or trustedTesters.'
+    description: 'Publish target: public or testers.'
     required: false
-    default: 'default'
+    default: 'public'
+
+  # Whether to request expedited review if eligible
   expedited_review:
     description: 'Request expedited review if eligible (true/false). Falls back to regular review if not eligible.'
     required: false
     default: 'false'
+
+  # Private key data for CRX signing (optional)
+  crx_private_key:
+    description: 'CRX signing private key (PEM string). If provided, the extension will be signed and uploaded as a CRX.'
+    required: false
+
+  # Path to the private key file for CRX signing (optional)
+  crx_private_key_path:
+    description: 'Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as a CRX.'
+    required: false
+
+# Specifies Docker as the runtime environment
+# and uses the Docker image from GitHub Container Registry (GHCR).
+# The entrypoint is set to 'pnpm start' to run the application.
 runs:
-  using: 'node16'
-  main: 'src/index.js'
+  using: 'docker'
+  image: 'ghcr.io/puzzlers-labs/chrome-webstore-publish:latest'
+  entrypoint: ['pnpm', 'start']
+
+# Customizes the action's appearance in the GitHub Actions UI.
 branding:
   icon: 'upload-cloud'
-  color: 'blue' 
+  color: 'purple'
