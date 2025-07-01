@@ -1,0 +1,49 @@
+{
+  // VSCode Extensions Configuration
+  // Defines the recommended extensions for contributors
+  // Ensures consistent development environment and tooling across the team
+
+  "recommendations": [
+    // Prettier - Code formatter for consistent styling across all file types
+    // Integrates with prettier.config.js for documentation-optimized formatting
+    "esbenp.prettier-vscode",
+
+    // Trailing Spaces - Highlights and removes unwanted whitespace
+    // Prevents Git diff noise and maintains clean file formatting
+    // Configured in settings.json with red highlighting and auto-trim on save
+    "shardulm94.trailing-spaces",
+
+    // GitHub Actions Support
+    // Workflow management and authoring assistance for CI/CD pipelines
+    // Provides syntax highlighting, validation, code completion, and workflow monitoring
+    // Essential for managing the build and release automation workflows
+    "GitHub.vscode-github-actions",
+
+    // ESLint Support
+    // JavaScript/TypeScript linting and error detection
+    // Integrates with eslint.config.js for real-time code quality feedback
+    // Essential for maintaining code standards and catching errors early
+    "dbaeumer.vscode-eslint",
+
+    // Docker Support
+    // Essential for managing Docker containers and images
+    // Provides syntax highlighting, code completion, and Docker commands
+    "ms-azuretools.vscode-docker"
+  ]
+
+  // Extension Selection Rationale
+  // This minimal set of 5 extensions provides maximum value with minimal overhead
+  // Each extension serves a specific purpose for development and quality assurance
+  //
+  // Core Development Tools Covered:
+  // - Code formatting and consistency (Prettier)
+  // - Code quality and linting (ESLint)
+  // - Clean file maintenance (Trailing Spaces)
+  // - Docker development and workflow management (Docker)
+  // - CI/CD workflow management (GitHub Actions)
+  //
+  // Excluded Extensions
+  // Many common extensions are intentionally omitted to keep the setup lightweight
+  // Contributors can install additional extensions based on personal preference
+  // The core functionality for development and deployment workflows is covered by these 5 extensions
+}

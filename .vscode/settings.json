@@ -1,0 +1,49 @@
+{
+  // VSCode Settings Configuration
+  // Optimizes the development environment for Prettier formatting and performance enhancements
+
+  // Essential Editor Configuration
+  // Sets up consistent formatting and editing behavior across the project
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Prettier Configuration
+  // Points to the JavaScript config file for inline comments and advanced settings
+  "prettier.configPath": ".prettierrc",
+
+  // Problem Panel Visibility Control
+  // Hides the Problems panel to reduce distractions during documentation work
+  "problems.visibility": false,
+
+  // Trailing Spaces Configuration (Essential Extension)
+  // Automatically removes trailing whitespace and highlights it for clean commits
+  "trailing-spaces.trimOnSave": true,
+  "trailing-spaces.includeEmptyLines": true,
+  "trailing-spaces.highlightCurrentLine": true,
+  "trailing-spaces.backgroundColor": "rgba(255,0,0,0.15)",
+  "trailing-spaces.borderColor": "rgba(255,100,100,0.3)",
+
+  // Performance Optimizations
+  // Excludes large directories from search to improve VSCode responsiveness
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/pnpm-lock.yaml": true
+  },
+
+  // Cross-platform Compatibility
+  // Ensures consistent line endings and auto-save behavior across different operating systems
+  "files.eol": "\n",
+  "files.autoSave": "onFocusChange",
+
+  // File Watcher Performance
+  // Prevents VSCode from watching large directories that change frequently
+  // Improves performance and reduces CPU usage during development
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true
+  }
+}

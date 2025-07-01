@@ -1,0 +1,43 @@
+name: Lint on pull request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # ----------------------------------------------
+      # 1. Checkout repository
+      # ----------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------
+      # 2. Set up Node.js
+      # ----------------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ----------------------------------------------
+      # 3. Setup pnpm
+      # ----------------------------------------------
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # ----------------------------------------------
+      # 4. Install dependencies
+      # ----------------------------------------------
+      - name: Install dependencies
+        run: pnpm install
+
+      # ----------------------------------------------
+      # 4. Run linter
+      # ----------------------------------------------
+      - name: Run linter
+        run: pnpm lint
