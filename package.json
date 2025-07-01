@@ -5,7 +5,6 @@
   "description": "GitHub Action to upload and publish Chrome extensions to the Chrome Web Store via API.",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm",
   "engines": {
     "node": ">=22.0.0"
   },
