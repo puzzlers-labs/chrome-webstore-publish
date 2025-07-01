@@ -1,0 +1,33 @@
+name: 'chrome-webstore-publish'
+description: 'Upload and publish Chrome extension ZIPs to the Chrome Web Store via API.'
+author: 'OSS Community'
+inputs:
+  extension_id:
+    description: 'The Chrome Web Store extension ID.'
+    required: true
+  zip_file:
+    description: 'Path to the extension ZIP file.'
+    required: true
+  client_id:
+    description: 'Google Cloud OAuth2 client ID.'
+    required: true
+  client_secret:
+    description: 'Google Cloud OAuth2 client secret.'
+    required: true
+  refresh_token:
+    description: 'OAuth2 refresh token.'
+    required: true
+  publish_target:
+    description: 'Publish target: default (public) or trustedTesters.'
+    required: false
+    default: 'default'
+  expedited_review:
+    description: 'Request expedited review if eligible (true/false). Falls back to regular review if not eligible.'
+    required: false
+    default: 'false'
+runs:
+  using: 'node16'
+  main: 'src/index.js'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue' 
