@@ -1,1 +1,3 @@
+# Specifies the Node.js version to be used for this project.
+# Ensures consistency across development, CI, and deployment environments.
 22
