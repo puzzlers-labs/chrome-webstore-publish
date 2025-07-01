@@ -59,6 +59,21 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.RELEASE_VERSION }}
 
+      # Logs in to Docker Hub using secrets.
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      # Tags the Docker image for Docker Hub.
+      - name: Tag Docker image for Docker Hub
+        run: |
+          docker tag ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.RELEASE_VERSION }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/$(echo "${{ github.repository }}" | cut -d'/' -f2):${{ steps.get_version.outputs.RELEASE_VERSION }}
+
+      # Pushes the Docker image to Docker Hub.
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$(echo "${{ github.repository }}" | cut -d'/' -f2):${{ steps.get_version.outputs.RELEASE_VERSION }}
+
       # Gets the name of the default branch.
       - name: Get default branch
         id: default_branch
