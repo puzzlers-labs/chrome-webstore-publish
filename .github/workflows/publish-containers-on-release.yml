@@ -4,7 +4,7 @@
 # The commit is pushed with a bot user to keep versioning in sync with releases.
 # This ensures that the package.json version always matches the latest release tag.
 
-name: Bump package version on release
+name: Bump version and publish Docker images on release
 
 on:
   release:
