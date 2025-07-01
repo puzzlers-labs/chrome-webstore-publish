@@ -1,15 +1,19 @@
 {
   "name": "chrome-webstore-publish",
   "version": "1.0.0",
+  "author": "Puzzlers Labs",
   "description": "GitHub Action to upload and publish Chrome extensions to the Chrome Web Store via API.",
-  "main": "src/index.js",
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "echo \"No tests yet\""
   },
-  "author": "OSS Community",
-  "license": "Apache-2.0",
   "dependencies": {
     "axios": "^1.6.8",
     "form-data": "^4.0.0",
@@ -17,10 +21,11 @@
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "prettier": "^3.2.5"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "packageManager": "pnpm@^8.0.0"
+    "prettier": "^3.2.5",
+    "eslint-plugin-n": "^17.20.0",
+    "eslint-plugin-es-x": "^7.1.0",
+    "@stylistic/eslint-plugin": "^1.5.4",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-promise": "^6.1.1"
+  }
 }
