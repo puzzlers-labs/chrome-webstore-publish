@@ -61,7 +61,7 @@ jobs:
 
       # Logs in to Docker Hub using secrets.
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
 
       # Tags the Docker image for Docker Hub.
       - name: Tag Docker image for Docker Hub
