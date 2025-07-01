@@ -43,7 +43,7 @@ jobs:
       # Updates the version in package.json to match the release version, without creating a git tag.
       - name: Bump package.json version
         run: |
-          pnpm version --no-git-tag-version "$RELEASE_VERSION"
+          pnpm version --no-git-tag-version "${{ steps.get_version.outputs.RELEASE_VERSION }}"
 
       # Logs in to GitHub Container Registry (GHCR) using the GitHub Actions token.
       - name: Log in to GHCR
@@ -65,5 +65,5 @@ jobs:
           git config user.name "puzzlers-tech[bot]"
           git config user.email "tech@puzzlers-labs.com"
           git add package.json
-          git commit -m "chore: bump version to v$RELEASE_VERSION [skip ci]"
+          git commit -m "chore: bump version to v${{ steps.get_version.outputs.RELEASE_VERSION }} [skip ci]"
           git push
