@@ -1,7 +1,6 @@
-// This file configures ESLint for the project to enforce code quality and style rules.
-// It sets the environment, parser options, base rules, and custom linting rules for consistency.
-// Updated to use ECMAScript 2024 (ES15) for latest JavaScript features and standards.
-// Additional plugins added: eslint-plugin-n, eslint-plugin-es-x, @stylistic/eslint-plugin, eslint-plugin-import, eslint-plugin-promise
+// ESLint configuration file to enforce code quality and consistent style across the project.
+// Sets up environment, parser options, base rules, and plugins for Node.js and ECMAScript 2024.
+// Uses recommended rules from ESLint and plugins for Node, import, and promise handling.
 {
   // Specifies the environments for Node.js and ECMAScript 2024
   "env": {
@@ -12,7 +11,6 @@
   "extends": [
     "eslint:recommended",
     "plugin:n/recommended",
-    "plugin:@stylistic/recommended",
     "plugin:import/recommended",
     "plugin:promise/recommended"
   ],
@@ -22,7 +20,7 @@
     "sourceType": "module"
   },
   // Registers all plugins
-  "plugins": ["n", "@stylistic", "import", "promise"],
+  "plugins": ["n", "import", "promise"],
   // Custom linting rules for code style and error prevention
   "rules": {
     "semi": ["error", "always"],
