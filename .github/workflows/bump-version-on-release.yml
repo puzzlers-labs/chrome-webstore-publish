@@ -1,0 +1,61 @@
+name: Bump package version on release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      # ----------------------------------------------
+      # 1. Checkout repository
+      # ----------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to push tag for release
+
+      # ----------------------------------------------
+      # 2. Determine version from release tag
+      # ----------------------------------------------
+      - name: Determine target version
+        id: get_version
+        run: |
+          version="${{ github.event.release.tag_name }}"
+          clean_version=${version#v}  # strip leading v
+          echo "RELEASE_VERSION=$clean_version" >> "$GITHUB_OUTPUT"
+
+      # ----------------------------------------------
+      # 3. Set up Node.js
+      # ----------------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ----------------------------------------------
+      # 4. Setup pnpm
+      # ----------------------------------------------
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # ----------------------------------------------
+      # 5. Bump package.json version
+      # ----------------------------------------------
+      - name: Bump package.json version
+        run: |
+          pnpm version --no-git-tag-version "$RELEASE_VERSION"
+
+      # ----------------------------------------------
+      # 6. Commit and push version bump
+      # ----------------------------------------------
+      - name: Commit and push version bump
+        run: |
+          git config user.name "puzzlers-tech[bot]"
+          git config user.email "tech@puzzlers-labs.com"
+          git add package.json
+          git commit -m "chore: bump version to v$RELEASE_VERSION [skip ci]"
+          git push
