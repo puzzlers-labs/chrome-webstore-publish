@@ -5,7 +5,7 @@
 
   "recommendations": [
     // Prettier - Code formatter for consistent styling across all file types
-    // Integrates with prettier.config.js for documentation-optimized formatting
+    // Integrates with .prettierrc for project-wide formatting rules
     "esbenp.prettier-vscode",
 
     // Trailing Spaces - Highlights and removes unwanted whitespace
@@ -21,7 +21,7 @@
 
     // ESLint Support
     // JavaScript/TypeScript linting and error detection
-    // Integrates with eslint.config.js for real-time code quality feedback
+    // Integrates with ESLint config for real-time code quality feedback
     // Essential for maintaining code standards and catching errors early
     "dbaeumer.vscode-eslint",
 
