@@ -34,6 +34,7 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
     ? 'application/x-chrome-extension'
     : 'application/zip';
   try {
+    console.log('Uploading extension package to Chrome Web Store...');
     const res = await axios.put(url, fileStream, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -46,8 +47,11 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
     if (res.data.uploadState !== 'SUCCESS') {
       throw new Error(`Upload failed: ${JSON.stringify(res.data)}`);
     }
+
+    console.log('Extension package uploaded successfully.');
     return res.data;
   } catch (err) {
+    console.error('Failed to upload extension package:', err);
     throw new Error(`Failed to upload extension: ${err.response?.data?.error || err.message}`);
   }
 }

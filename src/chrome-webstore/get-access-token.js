@@ -37,14 +37,18 @@ async function getAccessToken({ clientId, clientSecret, refreshToken }) {
 
   // Make the request to Google OAuth2
   try {
+    console.log('Requesting new OAuth2 access token from Google...');
     const res = await axios.post(url, data, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     if (!res.data.access_token) {
       throw new Error('No access_token in response');
     }
+
+    console.log('Access token successfully retrieved.');
     return res.data.access_token;
   } catch (err) {
+    console.error('Failed to get access token:', err);
     throw new Error(
       `Failed to get access token: ${err.response?.data?.error_description || err.message}`
     );

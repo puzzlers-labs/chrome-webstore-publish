@@ -23,24 +23,30 @@ async function packCrxWithChrome(unpackedDir, privateKeyPath) {
   // Chromium is always installed at this path in the Docker container
   const chromePath = '/usr/bin/chromium-browser';
   try {
+    console.log('Checking for Chromium in Docker container...');
     execSync(`${chromePath} --version`, { stdio: 'ignore' });
   } catch (_err) {
+    console.error('Chromium not found at expected path.');
     throw new Error('Chromium not found at /usr/bin/chromium-browser in the Docker container.');
   }
 
   try {
+    console.log('Packing extension directory into CRX...');
     execSync(
       `${chromePath} --headless --no-sandbox --pack-extension=${unpackedDir} --pack-extension-key=${privateKeyPath}`
     );
   } catch (e) {
+    console.error('Failed to pack CRX with Chromium:', e);
     throw new Error(`Failed to pack CRX with Chromium: ${e.message}`);
   }
 
   // Check if the CRX file was created
   const crxFile = `${unpackedDir}.crx`;
   if (!fs.existsSync(crxFile)) {
+    console.error('CRX file not found after packing.');
     throw new Error(`CRX file not found at expected location: ${crxFile}`);
   }
+  console.log('CRX file created successfully:', crxFile);
   return crxFile;
 }
 

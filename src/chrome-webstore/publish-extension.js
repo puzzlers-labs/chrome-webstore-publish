@@ -29,7 +29,7 @@ async function publishExtension({
     throw new Error('accessToken (string) is required');
   }
   if (publishTarget !== 'trustedTesters' && publishTarget !== 'default') {
-    throw new Error('publishTarget must be \'trustedTesters\' or \'default\'');
+    throw new Error('publishTarget must be `trustedTesters` or `default`');
   }
 
   const url = `https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}/publish`;
@@ -41,6 +41,7 @@ async function publishExtension({
   // Attempt expedited review if requested
   if (expeditedReview) {
     try {
+      console.log('Attempting expedited review publish...');
       const res = await axios.post(
         url,
         { ...baseBody, reviewExemption: true },
@@ -55,14 +56,18 @@ async function publishExtension({
       if (!res.data.status || !res.data.status.includes('OK')) {
         throw new Error(`Publish (expedited) failed: ${JSON.stringify(res.data)}`);
       }
+
+      console.log('Expedited review publish successful.');
       return res.data;
     } catch (_err) {
       // Fall back to regular review if expedited fails
+      console.warn('Expedited review publish failed, falling back to regular review.');
     }
   }
 
   // Fallback to regular review (no expedited reviewExemption)
   try {
+    console.log('Attempting regular publish...');
     const res = await axios.post(url, baseBody, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -73,8 +78,11 @@ async function publishExtension({
     if (!res.data.status || !res.data.status.includes('OK')) {
       throw new Error(`Publish failed: ${JSON.stringify(res.data)}`);
     }
+
+    console.log('Extension published successfully.');
     return res.data;
   } catch (err) {
+    console.error('Failed to publish extension:', err);
     throw new Error(`Failed to publish extension: ${err.response?.data?.error || err.message}`);
   }
 }
