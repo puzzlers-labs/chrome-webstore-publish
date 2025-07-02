@@ -27,7 +27,7 @@ async function publishExtension({
     throw new Error('accessToken (string) is required');
   }
   if (publishTarget !== 'trustedTesters' && publishTarget !== 'default') {
-    throw new Error("publishTarget must be 'trustedTesters' or 'default'");
+    throw new Error('publishTarget must be \'trustedTesters\' or \'default\'');
   }
 
   const url = `https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}/publish`;
@@ -54,7 +54,7 @@ async function publishExtension({
         throw new Error(`Publish (expedited) failed: ${JSON.stringify(res.data)}`);
       }
       return res.data;
-    } catch (err) {
+    } catch (_err) {
       // Fall back to regular review if expedited fails
     }
   }
