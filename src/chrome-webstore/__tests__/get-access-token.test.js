@@ -32,4 +32,43 @@ describe('getAccessToken', () => {
       getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })
     ).rejects.toThrow('fail');
   });
+
+  // Tests that an error is thrown if clientId is missing or invalid
+  it('throws error if clientId is missing or invalid', async () => {
+    await expect(
+      getAccessToken({ clientSecret: 'secret', refreshToken: 'refresh' })
+    ).rejects.toThrow('clientId is required');
+    await expect(
+      getAccessToken({ clientId: '', clientSecret: 'secret', refreshToken: 'refresh' })
+    ).rejects.toThrow('clientId is required');
+    await expect(
+      getAccessToken({ clientId: 123, clientSecret: 'secret', refreshToken: 'refresh' })
+    ).rejects.toThrow('clientId is required');
+  });
+
+  // Tests that an error is thrown if clientSecret is missing or invalid
+  it('throws error if clientSecret is missing or invalid', async () => {
+    await expect(getAccessToken({ clientId: 'id', refreshToken: 'refresh' })).rejects.toThrow(
+      'clientSecret is required'
+    );
+    await expect(
+      getAccessToken({ clientId: 'id', clientSecret: '', refreshToken: 'refresh' })
+    ).rejects.toThrow('clientSecret is required');
+    await expect(
+      getAccessToken({ clientId: 'id', clientSecret: 123, refreshToken: 'refresh' })
+    ).rejects.toThrow('clientSecret is required');
+  });
+
+  // Tests that an error is thrown if refreshToken is missing or invalid
+  it('throws error if refreshToken is missing or invalid', async () => {
+    await expect(getAccessToken({ clientId: 'id', clientSecret: 'secret' })).rejects.toThrow(
+      'refreshToken is required'
+    );
+    await expect(
+      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: '' })
+    ).rejects.toThrow('refreshToken is required');
+    await expect(
+      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: 123 })
+    ).rejects.toThrow('refreshToken is required');
+  });
 });
