@@ -24,3 +24,6 @@ docker-compose.override.yml
 # Swap files created by editors (like Vim)
 *.swp
 *.swo
+
+# Coverage reports
+coverage/
