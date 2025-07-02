@@ -2,7 +2,9 @@
  * Handles publishing a Chrome extension to the Chrome Web Store.
  * The extension is already uploaded to the Chrome Web Store. This will only publish the extension.
  */
+
 import axios from 'axios';
+
 /**
  * Publishes an extension to the public or to trusted testers, with optional expedited review fallback.
  * Validates required parameters and constructs the correct API endpoint using the request body for publish options.
@@ -27,7 +29,7 @@ async function publishExtension({
     throw new Error('accessToken (string) is required');
   }
   if (publishTarget !== 'trustedTesters' && publishTarget !== 'default') {
-    throw new Error('publishTarget must be \'trustedTesters\' or \'default\'');
+    throw new Error("publishTarget must be 'trustedTesters' or 'default'");
   }
 
   const url = `https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}/publish`;
