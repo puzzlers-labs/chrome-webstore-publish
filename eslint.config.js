@@ -2,8 +2,8 @@
 // Sets up recommended rules and plugins for code quality, import management, and promises.
 // Exports an array for use with ESLint's flat config system.
 import js from '@eslint/js';
-import node from 'eslint-plugin-n';
 import importPlugin from 'eslint-plugin-import';
+import node from 'eslint-plugin-n';
 import promise from 'eslint-plugin-promise';
 
 export default [
@@ -36,7 +36,14 @@ export default [
       ...promise.configs.recommended.rules, // Promise plugin recommended rules.
       semi: ['error', 'always'], // Enforces semicolons at the end of statements.
       quotes: ['error', 'single'], // Requires single quotes for strings.
-      'no-unused-vars': ['warn'], // Warns about variables that are declared but not used.
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ], // Warns about variables that are declared but not used, but ignores those starting with _.
       'no-console': ['off'], // Allows use of console statements.
       'import/order': [
         'error',
@@ -63,7 +70,7 @@ export default [
             order: 'asc',
             caseInsensitive: true,
           },
-          'newlines-between': 'always',
+          'newlines-between': 'never',
         },
       ], // Enforces order: package imports first (alphabetical), then internal @src imports.
     },
