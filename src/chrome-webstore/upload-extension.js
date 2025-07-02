@@ -1,8 +1,10 @@
 /**
  * Handles uploading a new version package (ZIP or CRX) of a Chrome extension to the Chrome Web Store.
  */
+
 import fs from 'fs';
 import axios from 'axios';
+
 /**
  * Uploads a package file (ZIP or CRX) containing the extension to the Chrome Web Store.
  * Uses a PUT request with the extension's ID and access token for authentication.

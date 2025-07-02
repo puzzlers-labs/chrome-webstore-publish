@@ -3,7 +3,7 @@
 # - node_modules: Exclude installed dependencies
 # - .git, .github: Exclude git and GitHub config/history
 # - .vscode: Exclude editor settings
-# - Dockerfile, README.md, action.yml, pnpm-lock.yaml, temp.txt: Exclude build/config/docs not needed in the image
+# - Dockerfile, README.md, action.yml: Exclude build/config/docs not needed in the image
 node_modules
 .git
 .github
@@ -11,5 +11,3 @@ node_modules
 Dockerfile
 README.md
 action.yml
-pnpm-lock.yaml
-temp.txt

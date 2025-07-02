@@ -2,7 +2,9 @@
  * Handles publishing a Chrome extension to the Chrome Web Store.
  * The extension is already uploaded to the Chrome Web Store. This will only publish the extension.
  */
+
 import axios from 'axios';
+
 /**
  * Publishes an extension to the public or to trusted testers, with optional expedited review fallback.
  * Validates required parameters and constructs the correct API endpoint using the request body for publish options.
