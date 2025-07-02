@@ -1,0 +1,67 @@
+# This workflow runs both the linter and the test suite on every pull request to ensure code quality and correctness.
+# It triggers on pull request events, sets up the environment, installs dependencies, and runs both lint and test jobs in parallel.
+# Node.js and pnpm are used for dependency management and running scripts.
+# Each job runs separately, so the PR will show distinct checks for linting and testing.
+# This helps catch linting errors and test failures before merging code into the main branch.
+# The workflow is automated to maintain code standards and reliability across contributions.
+
+name: Lint and Test on pull request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the repository so workflow can access and modify files.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Sets up the specified Node.js version for running scripts and pnpm.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Installs the latest version of pnpm for package management.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Installs all project dependencies using pnpm.
+      - name: Install dependencies
+        run: pnpm install
+
+      # Runs the linter to check for code style and quality issues.
+      - name: Run linter
+        run: pnpm lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the repository so workflow can access and modify files.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Sets up the specified Node.js version for running scripts and pnpm.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Installs the latest version of pnpm for package management.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Installs all project dependencies using pnpm.
+      - name: Install dependencies
+        run: pnpm install
+
+      # Runs the test suite to check for correctness.
+      - name: Run tests
+        run: pnpm test
