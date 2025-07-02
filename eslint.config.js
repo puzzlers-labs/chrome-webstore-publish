@@ -22,14 +22,6 @@ export default [
       import: importPlugin, // Adds rules for managing imports and exports.
       promise: promise, // Adds rules for working with Promises.
     },
-    settings: {
-      'import/resolver': {
-        alias: {
-          map: [['@src', './src']],
-          extensions: ['.js'],
-        },
-      },
-    },
     rules: {
       ...node.configs.recommended.rules, // Node.js recommended rules.
       ...importPlugin.configs.recommended.rules, // Import plugin recommended rules.
@@ -73,6 +65,20 @@ export default [
           'newlines-between': 'never',
         },
       ], // Enforces order: package imports first (alphabetical), then internal @src imports.
+      // Ignore unresolved import errors for @src alias paths due to lack of flat config support.
+      // This is intentional: ESLint flat config does not support import/resolver alias settings as of July 2025.
+      'import/no-unresolved': [
+        'error',
+        {
+          ignore: ['^@src/'],
+        },
+      ],
+      'n/no-missing-import': [
+        'error',
+        {
+          allowModules: ['@src'],
+        },
+      ],
     },
   },
   {
