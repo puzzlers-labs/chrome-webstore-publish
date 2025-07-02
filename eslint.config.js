@@ -1,6 +1,8 @@
-// ESLint configuration for Node.js using ECMAScript 2024.
-// Sets up recommended rules and plugins for code quality, import management, and promises.
-// Exports an array for use with ESLint's flat config system.
+// ESLint configuration file for Node.js projects using ECMAScript 2024.
+// This file sets up linting rules and plugins to enforce code quality, import order, and best practices.
+// It exports an array of configuration objects for use with ESLint's flat config system.
+// The configuration includes recommended rules for JavaScript, Node.js, import management, and promises.
+// Special rules are applied for test files and this config file itself.
 import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 import node from 'eslint-plugin-n';
@@ -15,8 +17,8 @@ export default [
       sourceType: 'module', // Allows use of ES module import/export syntax.
       globals: {
         ...node.configs.recommended.globals, // Includes Node.js global variables.
-        process: 'readonly',
-        console: 'readonly',
+        process: 'readonly', // Allows read-only access to the process object.
+        console: 'readonly', // Allows read-only access to the console object.
       },
     },
     plugins: {
@@ -37,7 +39,7 @@ export default [
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
         },
-      ], // Warns about variables that are declared but not used, but ignores those starting with _.
+      ], // Warns about unused variables, but ignores those starting with _.
       'no-console': ['off'], // Allows use of console statements.
       'import/order': [
         'error',
@@ -66,23 +68,40 @@ export default [
           },
           'newlines-between': 'never',
         },
-      ], // Enforces order: package imports first (alphabetical), then internal @src imports.
-      // Ignore unresolved import errors for @src alias paths due to lack of flat config support.
-      // This is intentional: ESLint flat config does not support import/resolver alias settings as of July 2025.
+      ], // Enforces import order: package imports first (alphabetical), then internal @src imports.
+      // Ignores unresolved import errors for @src alias paths due to lack of flat config support.
       'import/no-unresolved': [
         'error',
         {
           ignore: ['^@src/'],
         },
       ],
-      'n/no-missing-import': 'off',
-      'n/no-process-exit': 'off', // Allow use of process.exit()
+      'n/no-missing-import': 'off', // Disables missing import rule for Node.js. This is the alias issue.
+      'n/no-process-exit': 'off', // Allows use of process.exit().
     },
   },
   {
     files: ['eslint.config.js'], // Special config for this config file.
     rules: {
       'n/no-unpublished-import': 'off', // Disables unpublished import rule for config files.
+    },
+  },
+  {
+    files: ['**/__tests__/*.js'], // Applies special rules for test files.
+    languageOptions: {
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+      },
+    },
+    rules: {
+      'n/no-unpublished-import': 'off', // Disables unpublished import rule for test files.
     },
   },
 ];
