@@ -63,4 +63,30 @@ describe('packCrxWithChrome', () => {
     const result = await packCrxWithChrome(unpackedDir, privateKeyPath);
     expect(result).toBe(crxFile);
   });
+
+  // Tests that an error is thrown if unpackedDir is missing or invalid
+  it('throws error if unpackedDir is missing or invalid', async () => {
+    await expect(packCrxWithChrome(undefined, '/fake/key.pem')).rejects.toThrow(
+      'unpackedDir must be a non-empty string'
+    );
+    await expect(packCrxWithChrome('', '/fake/key.pem')).rejects.toThrow(
+      'unpackedDir must be a non-empty string'
+    );
+    await expect(packCrxWithChrome(123, '/fake/key.pem')).rejects.toThrow(
+      'unpackedDir must be a non-empty string'
+    );
+  });
+
+  // Tests that an error is thrown if privateKeyPath is missing or invalid
+  it('throws error if privateKeyPath is missing or invalid', async () => {
+    await expect(packCrxWithChrome('/fake/dir', undefined)).rejects.toThrow(
+      'privateKeyPath must be a non-empty string'
+    );
+    await expect(packCrxWithChrome('/fake/dir', '')).rejects.toThrow(
+      'privateKeyPath must be a non-empty string'
+    );
+    await expect(packCrxWithChrome('/fake/dir', 123)).rejects.toThrow(
+      'privateKeyPath must be a non-empty string'
+    );
+  });
 });

@@ -40,4 +40,51 @@ describe('uploadExtension', () => {
     axios.put.mockRejectedValue({ response: { data: { error: 'fail' } } });
     await expect(uploadExtension(params)).rejects.toThrow('fail');
   });
+
+  // Should throw with error message if axios request fails with no response property.
+  it('throws error on request failure with no response', async () => {
+    axios.put.mockRejectedValue(new Error('network down'));
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: 'token' })
+    ).rejects.toThrow('network down');
+  });
+
+  // Tests that an error is thrown if extensionId is missing or invalid
+  it('throws error if extensionId is missing or invalid', async () => {
+    await expect(
+      uploadExtension({ packageFilePath: 'path/to/zip', accessToken: 'token' })
+    ).rejects.toThrow('extensionId is required');
+    await expect(
+      uploadExtension({ extensionId: '', packageFilePath: 'path/to/zip', accessToken: 'token' })
+    ).rejects.toThrow('extensionId is required');
+    await expect(
+      uploadExtension({ extensionId: 123, packageFilePath: 'path/to/zip', accessToken: 'token' })
+    ).rejects.toThrow('extensionId is required');
+  });
+
+  // Tests that an error is thrown if packageFilePath is missing or invalid
+  it('throws error if packageFilePath is missing or invalid', async () => {
+    await expect(uploadExtension({ extensionId: 'id', accessToken: 'token' })).rejects.toThrow(
+      'packageFilePath is required'
+    );
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: '', accessToken: 'token' })
+    ).rejects.toThrow('packageFilePath is required');
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: 123, accessToken: 'token' })
+    ).rejects.toThrow('packageFilePath is required');
+  });
+
+  // Tests that an error is thrown if accessToken is missing or invalid
+  it('throws error if accessToken is missing or invalid', async () => {
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip' })
+    ).rejects.toThrow('accessToken is required');
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: '' })
+    ).rejects.toThrow('accessToken is required');
+    await expect(
+      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: 123 })
+    ).rejects.toThrow('accessToken is required');
+  });
 });
