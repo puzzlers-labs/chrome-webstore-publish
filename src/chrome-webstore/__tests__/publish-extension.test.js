@@ -49,4 +49,47 @@ describe('publishExtension', () => {
     axios.post.mockRejectedValueOnce({ response: { data: { error: 'fail' } } });
     await expect(publishExtension(params)).rejects.toThrow('fail');
   });
+
+  // Tests that an error is thrown if extensionId is missing or invalid
+  it('throws error if extensionId is missing or invalid', async () => {
+    await expect(publishExtension({ accessToken: 'token' })).rejects.toThrow(
+      'extensionId (string) is required'
+    );
+    await expect(publishExtension({ extensionId: '', accessToken: 'token' })).rejects.toThrow(
+      'extensionId (string) is required'
+    );
+    await expect(publishExtension({ extensionId: 123, accessToken: 'token' })).rejects.toThrow(
+      'extensionId (string) is required'
+    );
+  });
+
+  // Tests that an error is thrown if accessToken is missing or invalid
+  it('throws error if accessToken is missing or invalid', async () => {
+    await expect(publishExtension({ extensionId: 'id' })).rejects.toThrow(
+      'accessToken (string) is required'
+    );
+    await expect(publishExtension({ extensionId: 'id', accessToken: '' })).rejects.toThrow(
+      'accessToken (string) is required'
+    );
+    await expect(publishExtension({ extensionId: 'id', accessToken: 123 })).rejects.toThrow(
+      'accessToken (string) is required'
+    );
+  });
+
+  // Tests that an error is thrown if publishTarget is invalid
+  it('throws error if publishTarget is invalid', async () => {
+    await expect(
+      publishExtension({ extensionId: 'id', accessToken: 'token', publishTarget: 'invalid' })
+    ).rejects.toThrow('publishTarget must be `trustedTesters` or `default`');
+  });
+
+  // Tests that an error is thrown if the regular publish request itself fails (fallback path)
+  it('throws error if regular publish request fails after expedited fails', async () => {
+    axios.post
+      .mockRejectedValueOnce({ response: { data: { error: 'expedite fail' } } }) // expedited fails
+      .mockRejectedValueOnce({ response: { data: { error: 'regular fail' } } }); // regular fails
+    await expect(
+      publishExtension({ extensionId: 'id', accessToken: 'token', expeditedReview: true })
+    ).rejects.toThrow('regular fail');
+  });
 });
