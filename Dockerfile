@@ -1,34 +1,31 @@
-# Sets up a Node.js environment with Google Chrome and pnpm installed for running and managing Node.js applications that require Chrome.
-# Installs necessary tools, Chrome browser, and pnpm, then prepares the container for production use.
+# This Dockerfile sets up a Node.js 22 environment with Chromium and pnpm on Alpine Linux.
+# It installs pnpm, configures its store, installs production dependencies, copies the app source,
+# sets up permissions, switches to an unprivileged user, adds a Chromium health check, and defines the start command.
+FROM timbru31/node-chrome:22-alpine
 
-FROM node:22-slim
+# Switches to the root user to install pnpm and other configurations
+USER root
 
-# Update package list to get the latest versions of packages
-RUN apt-get update
-
-# Install essential tools for downloading and installing Chrome
-RUN apt-get install -y wget gnupg curl ca-certificates --no-install-recommends
-
-# Download the latest Google Chrome browser to a temporary location
-RUN curl -fsSL -o /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-
-# Install Google Chrome and fix dependencies if needed
-RUN dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get install -fy
-
-# Remove the .deb package after installation to reduce image size
-RUN rm /tmp/google-chrome-stable_current_amd64.deb
-
-# Clean up cached files to reduce image size
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install pnpm globally for efficient package management
+# Installs pnpm globally for package management
 RUN npm install -g pnpm
+# Configures pnpm to use a writable store directory
+RUN pnpm config set store-dir /opt/.pnpm-store
+# Creates the pnpm store directory
+RUN mkdir -p /opt/.pnpm-store
+# Sets ownership of the pnpm store to the node user
+RUN chown -R node:node /opt/.pnpm-store
 
-# Set the working directory for the application code
 WORKDIR /app
 
-# Copy application files into the container
-COPY . .
+# Copies dependency lock files for better Docker layer caching
+COPY package.json pnpm-lock.yaml* ./
+# Installs only production dependencies using the lock file
+RUN pnpm install --prod --frozen-lockfile
 
-# Install only production dependencies
-RUN pnpm install --prod
+# Copies the application source code into the image
+COPY . .
+# Ensures the app directory is owned by the node user
+RUN chown -R node:node /app
+
+# Switches to the unprivileged user
+USER node
