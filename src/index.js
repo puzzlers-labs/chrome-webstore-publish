@@ -38,19 +38,30 @@ async function run() {
       throw new Error('Provide only one of crx_private_key or crx_private_key_path, not both.');
     }
 
-    let packageFilePath = zipFilePath;
-    if (crxPrivateKey || crxPrivateKeyPath) {
+    // Normalize zip file path to ensure it works inside Docker
+    let resolvedZipFilePath = zipFilePath;
+    if (!path.isAbsolute(zipFilePath)) {
+      resolvedZipFilePath = path.join('/github/workspace', zipFilePath);
+    }
+
+    let resolvedCrxPrivateKeyPath = crxPrivateKeyPath;
+    if (crxPrivateKeyPath && !path.isAbsolute(crxPrivateKeyPath)) {
+      resolvedCrxPrivateKeyPath = path.join('/github/workspace', crxPrivateKeyPath);
+    }
+
+    let packageFilePath = resolvedZipFilePath;
+    if (crxPrivateKey || resolvedCrxPrivateKeyPath) {
       // Unpacks the ZIP file to a temporary directory and prepares a CRX package if a private key is provided.
       // Handles both direct private key string and private key file path.
       console.log('Unpacking ZIP and preparing CRX...');
       const tmpDir = fs.mkdtempSync(`${os.tmpdir()}/unpacked-`);
       await fs
-        .createReadStream(zipFilePath)
+        .createReadStream(resolvedZipFilePath)
         .pipe(unzipper.Extract({ path: tmpDir }))
         .promise();
 
       // Determine the private key path
-      let privateKeyPath = crxPrivateKeyPath;
+      let privateKeyPath = resolvedCrxPrivateKeyPath;
       if (crxPrivateKey) {
         // Writes the provided private key string to a temporary file for CRX packaging.
         const tmpKeyPath = path.join(os.tmpdir(), `crx-key-${Date.now()}.pem`);
