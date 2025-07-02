@@ -2,8 +2,6 @@
 # It triggers on pull request events, sets up the environment, installs dependencies, and runs both lint and test jobs in parallel.
 # Node.js and pnpm are used for dependency management and running scripts.
 # Each job runs separately, so the PR will show distinct checks for linting and testing.
-# This helps catch linting errors and test failures before merging code into the main branch.
-# The workflow is automated to maintain code standards and reliability across contributions.
 
 name: Lint and Test on pull request
 
@@ -61,6 +59,10 @@ jobs:
       # Installs all project dependencies using pnpm.
       - name: Install dependencies
         run: pnpm install
+
+      # Installs the browsers for puppeteer to use.
+      - name: Install puppeteer browsers
+        run: pnpm dlx puppeteer browsers install
 
       # Runs the test suite to check for correctness.
       - name: Run tests
