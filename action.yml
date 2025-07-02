@@ -20,7 +20,7 @@ inputs:
     required: true
 
   # Path to the ZIP file of the extension to upload.
-  zip_file:
+  zip_file_path:
     description: 'Path to the extension ZIP file.'
     required: true
 
