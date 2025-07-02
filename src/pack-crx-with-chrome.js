@@ -24,7 +24,7 @@ async function packCrxWithChrome(unpackedDir, privateKeyPath) {
   const chromePath = '/usr/bin/chromium-browser';
   try {
     execSync(`${chromePath} --version`, { stdio: 'ignore' });
-  } catch (e) {
+  } catch (_err) {
     throw new Error('Chromium not found at /usr/bin/chromium-browser in the Docker container.');
   }
 
