@@ -15,6 +15,8 @@ export default [
       sourceType: 'module', // Allows use of ES module import/export syntax.
       globals: {
         ...node.configs.recommended.globals, // Includes Node.js global variables.
+        process: 'readonly',
+        console: 'readonly',
       },
     },
     plugins: {
@@ -73,12 +75,8 @@ export default [
           ignore: ['^@src/'],
         },
       ],
-      'n/no-missing-import': [
-        'error',
-        {
-          allowModules: ['@src'],
-        },
-      ],
+      'n/no-missing-import': 'off',
+      'n/no-process-exit': 'off', // Allow use of process.exit()
     },
   },
   {
