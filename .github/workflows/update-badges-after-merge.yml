@@ -220,10 +220,12 @@ jobs:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          TOTAL=$(curl -s -H "Accept: application/vnd.github+json" \
+          RAW=$(curl -s -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $TOKEN" \
-            "https://api.github.com/repos/$OWNER/$REPO/packages/container/$IMAGE/versions" \
-            | jq '[.[] | .download_count] | add')
+            "https://api.github.com/repos/$OWNER/$REPO/packages/container/$IMAGE/versions")
+          echo "Raw API response:" >&2
+          echo "$RAW" >&2
+          TOTAL=$(echo "$RAW" | jq '[.[] | .download_count] | add')
           if [ -z "$TOTAL" ] || [ "$TOTAL" = "null" ]; then TOTAL=0; fi
           mkdir -p .github
           cat <<EOF > .github/ghcr-pulls-badge.json
