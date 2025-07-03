@@ -16,58 +16,39 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 1. Grab the raw HTML
-      - name: Download package page
-        run: |
-          curl -sL \
-            https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish \
-            -o page.html
+        - name: Fetch HTML
+        run: curl -sL https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish -o page.html
 
-      # 2. Set up Node (v22 because that’s what you’re using elsewhere)
-      - name: Set up Node.js
+      - name: Set up Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # 3. Install lightweight DOM + XPath libs and extract the value
-      - name: Run scraper
-        id: scraper
-        run: |
+      # install only the DOM/XPath libs
+      - run: |
+          npm --silent init -y
           npm --silent install xmldom xpath
-          node - <<'NODE'
-            const fs   = require('fs');
-            const core = require('@actions/core');
+
+      - name: Parse with XPath
+        id: scraper
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
             const {DOMParser} = require('xmldom');
             const xpath = require('xpath');
 
-            // load the HTML
             const html = fs.readFileSync('page.html', 'utf8');
+            const doc  = new DOMParser({errorHandler:{}}).parseFromString(html, 'text/html');
 
-            // parse as lenient HTML-ish XML
-            const doc  = new DOMParser({
-              errorHandler: { // swallow HTML-mismatch warnings
-                warning(){}, error(){}, fatalError(){}
-              }
-            }).parseFromString(html, 'text/html');
+            const node = xpath.select1('/html/body/div[1]/div[6]/main/turbo-frame/div/div/div/div[2]/div[2]/div[2]/div[2]/div[1]/h3', doc);
+            const value = node?.firstChild?.data.trim() || '';
 
-            // evaluate the supplied XPath
-            const node = xpath.select1(
-              '/html/body/div[1]/div[6]/main/turbo-frame/div/div/div/div[2]/div[2]/div[2]/div[2]/div[1]/h3',
-              doc
-            );
-
-            const value = node?.firstChild?.data.trim() ?? '';
-            console.log(`Scraped value → "${value}"`);
-
-            // expose as step output for later steps / workflow outputs
+            core.notice(`Scraped value ➜ ${value}`);
             core.setOutput('scraped_value', value);
-          NODE
 
-      # 4. Use the value (example)
-      - name: Print result
-        run: echo "::notice title=Scraped value::$SCRAPED"
-        env:
-          SCRAPED: ${{ steps.scraper.outputs.scraped_value }}
+      - name: Show result
+        run: echo "::notice title=Scraped value::${{ steps.scraper.outputs.scrape_value }}"
 
       - name: Commit updated badge
         uses: EndBug/add-and-commit@v9
