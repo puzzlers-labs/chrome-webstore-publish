@@ -75,16 +75,31 @@ jobs:
       - name: Install puppeteer browsers
         run: pnpm dlx puppeteer browsers install
 
-      # Runs tests and generates the coverage badge JSON file
-      - name: Run tests and generate coverage badge
+      # Runs tests and generates the coverage report
+      - name: Run tests and generate coverage report
         run: |
           npx jest --coverage --coverageReporters=text-summary > coverage.txt
-          COVERAGE=$(grep -Po 'All files.*\K[0-9]+(?=%)' coverage.txt)
+
+      # Prints the coverage.txt for debugging
+      - name: Print coverage.txt for debug
+        run: cat coverage.txt
+
+      # Parses the coverage value and generates the badge
+      - name: Parse coverage value and generate badge
+        run: |
+          set -x
+          COVERAGE=$(grep -Po 'All files.*\K[0-9]+(?=%)' coverage.txt || echo "")
+          echo "Extracted coverage: $COVERAGE"
+          if [ -z "$COVERAGE" ]; then
+            echo "Coverage value not found in coverage.txt"
+            exit 1
+          fi
+          COLOR=$( [ "$COVERAGE" -ge 90 ] && echo green || echo yellow )
           echo '{
             "schemaVersion": 1,
             "label": "coverage",
             "message": "'"$COVERAGE"'%",
-            "color": "'"$( [ $COVERAGE -ge 90 ] && echo green || echo yellow )"'"
+            "color": "'"$COLOR"'"
           }' > .github/coverage-badge.json
 
       # Uploads the updated coverage badge as an artifact
@@ -195,57 +210,6 @@ jobs:
           path: .github/test-status-badge.json
           retention-days: 7
 
-  action-pulls:
-    needs: setup-badges
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      # Checks out the repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Downloads the initial badge files
-      - name: Download badge artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: badges
-          path: .github
-
-      # Fetches and sums GHCR pull counts using the official REST API
-      - name: Get total GHCR pulls and generate badge
-        env:
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          IMAGE: ${{ github.event.repository.name }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          RAW=$(curl -s -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $TOKEN" \
-            "https://api.github.com/repos/$OWNER/$REPO/packages/container/$IMAGE/versions")
-          echo "Raw API response:" >&2
-          echo "$RAW" >&2
-          TOTAL=$(echo "$RAW" | jq '[.[] | .download_count] | add')
-          if [ -z "$TOTAL" ] || [ "$TOTAL" = "null" ]; then TOTAL=0; fi
-          mkdir -p .github
-          cat <<EOF > .github/ghcr-pulls-badge.json
-          {
-            "schemaVersion": 1,
-            "label": "ghcr pulls",
-            "message": "${TOTAL}",
-            "color": "blue"
-          }
-          EOF
-
-      # Uploads the ghcr pulls badge as an artifact
-      - name: Upload ghcr pulls badge
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ghcr-pulls-badge
-          path: .github/ghcr-pulls-badge.json
-          retention-days: 7
-
   push-badges:
     needs: [coverage, docker-build, tests, action-pulls]
     runs-on: ubuntu-latest
@@ -276,13 +240,6 @@ jobs:
           name: test-status-badge
           path: .github
 
-      # Downloads the updated ghcr pulls badge
-      - name: Download ghcr pulls badge
-        uses: actions/download-artifact@v4
-        with:
-          name: ghcr-pulls-badge
-          path: .github
-
       # Commits and pushes the updated badge files to the repository
       - name: Commit and push badges
         run: |
@@ -291,6 +248,5 @@ jobs:
           git add .github/coverage-badge.json
           git add .github/docker-build-badge.json
           git add .github/test-status-badge.json
-          git add .github/ghcr-pulls-badge.json
           git commit -m "chore: update badges [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
