@@ -1,10 +1,10 @@
-# This workflow automatically bumps the package version in package.json when a new release is published.
-# It runs on release events, extracts the version from the release tag, updates package.json, and commits the change.
-# The workflow uses Node.js and pnpm for version management and package handling.
-# The commit is pushed with a bot user to keep versioning in sync with releases.
-# This ensures that the package.json version always matches the latest release tag.
+# This workflow runs when a new release is published.
+# It updates the version in package.json to match the release tag.
+# The workflow builds and pushes Docker images to both GitHub Container Registry (GHCR) and Docker Hub, tagging them with the release version and 'latest'.
+# It commits and pushes the updated package.json using a bot account to keep versioning in sync.
+# The workflow also updates a major version alias tag (like v1, v2) to point to the latest release commit.
 
-name: Bump version and publish Docker images on release
+name: Bump version and publish packages on release
 
 on:
   release:
@@ -98,10 +98,12 @@ jobs:
           git commit -m "chore: bump version to v${{ steps.get_version.outputs.RELEASE_VERSION }} [skip ci]"
           git push origin HEAD:${{ steps.default_branch.outputs.DEFAULT_BRANCH }}
 
+      # Extracts the major version alias (v1, v2, etc.) from the release tag.
       - name: Extract major alias (v1, v2 …)
         id: alias
         run: echo "ALIAS=$(echo '${{ github.ref_name }}' | cut -d'.' -f1)" >> "$GITHUB_OUTPUT"
 
+      # Moves the major version alias tag to point to the latest release commit.
       - name: Move the alias tag
         run: |
           git config user.name "puzzlers-tech[bot]"
