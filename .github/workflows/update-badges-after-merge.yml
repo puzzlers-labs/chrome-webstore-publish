@@ -18,10 +18,15 @@ jobs:
       # Creates all badge JSON files with failing status
       - name: Set all badges to failing
         run: |
+          set -e
           mkdir -p .github
           echo '{ "schemaVersion": 1, "label": "Coverage", "message": "failed", "color": "red" }' > .github/coverage-badge.json
           echo '{ "schemaVersion": 1, "label": "Docker Build", "message": "failed", "color": "red" }' > .github/docker-build-badge.json
           echo '{ "schemaVersion": 1, "label": "Tests", "message": "failing", "color": "red" }' > .github/test-status-badge.json
+
+      # Debug: List files in .github to verify creation
+      - name: List badge files
+        run: ls -l .github
 
       # Uploads the badge files as an artifact for use in later jobs
       - name: Upload badge artifacts
