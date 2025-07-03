@@ -12,7 +12,7 @@ jobs:
         env:
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
-          IMAGE: ghcr.io/puzzlers-labs/chrome-webstore-publish
+          IMAGE: chrome-webstore-publish
         run: |
           RESPONSE=$(curl -sL \
             -H "Accept: application/vnd.github+json" \
