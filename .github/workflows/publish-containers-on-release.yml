@@ -87,3 +87,14 @@ jobs:
           git add package.json
           git commit -m "chore: bump version to v${{ steps.get_version.outputs.RELEASE_VERSION }} [skip ci]"
           git push origin HEAD:${{ steps.default_branch.outputs.DEFAULT_BRANCH }}
+
+      - name: Extract major alias (v1, v2 …)
+        id: alias
+        run: echo "ALIAS=$(echo '${{ github.ref_name }}' | cut -d'.' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Move the alias tag
+        run: |
+          git config user.name "puzzlers-tech[bot]"
+          git config user.email "tech@puzzlers-labs.com"
+          git tag -f ${{ steps.alias.outputs.ALIAS }} ${{ github.sha }}
+          git push -f origin ${{ steps.alias.outputs.ALIAS }}
