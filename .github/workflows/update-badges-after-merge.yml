@@ -211,29 +211,31 @@ jobs:
           name: badges
           path: .github
 
-      # Queries the action pull count using GitHub GraphQL API
-      - name: Query action pull count
-        id: ghcr
-        uses: pcmarcin/octokit-graphql-action@v2
+      - uses: octokit/graphql-action@v2.x
+        id: get_ghcr_pulls
         with:
           query: |
-            query {
-              repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
-                containerRegistry {
-                  package(name: "${{ github.event.repository.name }}") {
-                    versions(first: 1, orderBy: {field: CREATED_AT, direction: DESC}) {
-                      nodes { pullCount }
+            query ghcrPulls($owner: String!, $repo: String!) {
+              repository(owner: $owner, name: $repo) {
+                packages(first: 10, packageType: CONTAINER) {
+                  nodes {
+                    name
+                    statistics {
+                      downloadsTotal
                     }
                   }
                 }
               }
             }
-          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Generates the action pulls badge JSON file
       - name: Generate action pulls badge
         run: |
-          PULLS=$(echo "${{ steps.ghcr.outputs.data }}" | jq '.repository.containerRegistry.package.versions.nodes[0].pullCount')
+          PULLS=$(echo "${{ steps.get_ghcr_pulls.outputs.data }}" | jq '[.repository.packages.nodes[].statistics.downloadsTotal] | add')
           mkdir -p .github
           cat <<EOF > .github/action-pulls-badge.json
           {
