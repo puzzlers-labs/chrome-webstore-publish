@@ -1,6 +1,13 @@
-# This workflow updates status badges for coverage, Docker build, and tests after every manual trigger.
-# It runs in multiple jobs: initializes badges as failing, runs coverage, Docker build, and tests in parallel, and finally pushes the updated badges.
-# Artifacts are used to pass badge files between jobs, with a 7-day retention for debugging.
+# This workflow manages status badges for coverage, Docker build, and tests after each push or manual trigger.
+# It initializes badges as failing, runs jobs in parallel to update them, and pushes the results back to the repository.
+# Artifacts are used to transfer badge files between jobs for up to 7 days.
+#
+# Jobs:
+# - setup-badges: Initializes badge files as failing and uploads them as artifacts.
+# - coverage: Runs tests, calculates coverage, updates the coverage badge, and uploads it.
+# - docker-build: Builds the Docker image, updates the Docker build badge, and uploads it.
+# - tests: Runs tests, updates the test badge based on results, and uploads it.
+# - push-badges: Downloads all updated badges and pushes them to the repository.
 
 name: Update Badges After Push
 
@@ -13,11 +20,11 @@ jobs:
   setup-badges:
     runs-on: ubuntu-latest
     steps:
-      # Checks out the repository code
-      - name: Checkout code
+      # Checks out the repository code for badge initialization
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Creates all badge JSON files with failing status
+      # Creates badge JSON files with failing status for initial state
       - name: Set all badges to failing
         run: |
           set -e
@@ -26,11 +33,11 @@ jobs:
           echo '{ "schemaVersion": 1, "label": "Docker Build", "message": "failed", "color": "red" }' > .github/docker-build-badge.json
           echo '{ "schemaVersion": 1, "label": "Tests", "message": "failing", "color": "red" }' > .github/test-status-badge.json
 
-      # Debug: List files in .github to verify creation
+      # Lists badge files for debugging and verification
       - name: List badge files
         run: ls -l .github
 
-      # Uploads the badge files as an artifact for use in later jobs
+      # Uploads badge files as artifacts for use in other jobs
       - name: Upload badge artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -46,24 +53,24 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      # Checks out the repository code
-      - name: Checkout code
+      # Checks out the repository code for coverage job
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Downloads the initial badge files
+      # Downloads initial badge files for update
       - name: Download badge artifacts
         uses: actions/download-artifact@v4
         with:
           name: badges
           path: .github
 
-      # Sets up Node.js for running tests
+      # Sets up Node.js for running tests and coverage
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # Installs pnpm package manager
+      # Installs pnpm for dependency management
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -73,20 +80,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Installs browsers for Puppeteer
+      # Installs browsers required for Puppeteer tests
       - name: Install puppeteer browsers
         run: pnpm dlx puppeteer browsers install
 
-      # Runs tests and generates the coverage report
+      # Runs tests and generates a coverage report
       - name: Run tests and generate coverage report
         run: |
           npx jest --coverage --coverageReporters=text-summary > coverage.txt
 
-      # Prints the coverage.txt for debugging
+      # Prints the coverage report for debugging
       - name: Print coverage.txt for debug
         run: cat coverage.txt
 
-      # Parses the coverage value and generates the badge
+      # Extracts coverage percentage and generates a badge JSON file
       - name: Parse coverage value and generate badge
         run: |
           set -x
@@ -99,7 +106,7 @@ jobs:
           COLOR=$( [ "$(echo "$COVERAGE >= 90" | bc -l)" -eq 1 ] && echo green || echo yellow )
           echo '{
             "schemaVersion": 1,
-            "label": "coverage",
+            "label": "Coverage",
             "message": "'"$COVERAGE"'%",
             "color": "'"$COLOR"'"
           }' > .github/coverage-badge.json
@@ -118,24 +125,24 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      # Checks out the repository
+      # Checks out the repository for Docker build
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Downloads the initial badge files
+      # Downloads initial badge files for update
       - name: Download badge artifacts
         uses: actions/download-artifact@v4
         with:
           name: badges
           path: .github
 
-      # Builds the Docker image
+      # Builds the Docker image for the project
       - name: Build Docker image
         id: docker_build
         run: |
           docker build -t my-image-name .
 
-      # Updates the Docker build badge if the build succeeds
+      # Updates the Docker build badge to passing if build succeeds
       - name: Set status to success if build passed
         if: success()
         run: |
@@ -160,11 +167,11 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      # Checks out the repository
+      # Checks out the repository for running tests
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Downloads the initial badge files
+      # Downloads initial badge files for update
       - name: Download badge artifacts
         uses: actions/download-artifact@v4
         with:
@@ -177,7 +184,7 @@ jobs:
         with:
           node-version: '22'
 
-      # Installs pnpm package manager
+      # Installs pnpm for dependency management
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -187,11 +194,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Installs browsers for Puppeteer
+      # Installs browsers required for Puppeteer tests
       - name: Install puppeteer browsers
         run: pnpm dlx puppeteer browsers install
 
-      # Runs tests and updates the test badge based on the result
+      # Runs tests and sets the test badge based on the result
       - name: Run tests and set test badge
         run: |
           pnpm test && STATUS=passing || STATUS=failing
@@ -217,25 +224,25 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      # Checks out the repository
+      # Checks out the repository to push updated badges
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Downloads the updated coverage badge
+      # Downloads the updated coverage badge artifact
       - name: Download coverage badge
         uses: actions/download-artifact@v4
         with:
           name: coverage-badge
           path: .github
 
-      # Downloads the updated Docker build badge
+      # Downloads the updated Docker build badge artifact
       - name: Download Docker build badge
         uses: actions/download-artifact@v4
         with:
           name: docker-build-badge
           path: .github
 
-      # Downloads the updated test badge
+      # Downloads the updated test badge artifact
       - name: Download test status badge
         uses: actions/download-artifact@v4
         with:
