@@ -88,13 +88,13 @@ jobs:
       - name: Parse coverage value and generate badge
         run: |
           set -x
-          COVERAGE=$(grep -Po 'All files.*\K[0-9]+(?=%)' coverage.txt || echo "")
+          COVERAGE=$(grep -Po '^Lines\s*:\s*\K[0-9.]+(?=%)' coverage.txt || echo "")
           echo "Extracted coverage: $COVERAGE"
           if [ -z "$COVERAGE" ]; then
             echo "Coverage value not found in coverage.txt"
             exit 1
           fi
-          COLOR=$( [ "$COVERAGE" -ge 90 ] && echo green || echo yellow )
+          COLOR=$( [ "$(echo "$COVERAGE >= 90" | bc -l)" -eq 1 ] && echo green || echo yellow )
           echo '{
             "schemaVersion": 1,
             "label": "coverage",
