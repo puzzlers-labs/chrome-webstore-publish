@@ -1,7 +1,6 @@
 name: GHCR-pull-badge
 on:
-  schedule:
-    workflow_dispatch:
+  workflow_dispatch:
 jobs:
   pull-stats:
     runs-on: ubuntu-latest
