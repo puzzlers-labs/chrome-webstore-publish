@@ -16,34 +16,53 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch download stats & write JSON
+      - name: Fetch download stats & write JSON (verbose)
         uses: actions/github-script@v7
+        env:
+          DEBUG: 'true' # our own flag; not required
         with:
           script: |
-            const fs = require('node:fs');
+            const fs   = require('node:fs');
+            const core = require('@actions/core');
 
             const query = `
               query ($owner: String!, $pkg: String!) {
-                organization(login: $owner) {
+                organization(login: $owner) {      # swap to repository() if needed
                   packages(first: 1, names: [$pkg]) {
-                    nodes { statistics { downloadsTotalCount } }
+                    nodes {
+                      name
+                      statistics { downloadsTotalCount }
+                    }
                   }
                 }
               }`;
-            const vars = { owner: process.env.PACKAGE_OWNER, pkg: process.env.PACKAGE_NAME };
 
+            const vars  = {
+              owner: process.env.PACKAGE_OWNER,
+              pkg:   process.env.PACKAGE_NAME
+            };
+
+            /* ------------ EXECUTE ------------- */
             const data = await github.graphql(query, vars);
-            const downloads = data.organization.packages.nodes[0]?.statistics.downloadsTotalCount ?? 0;
+
+            /* ------------ LOGGING ------------- */
+            core.notice('Raw GraphQL response below ⬇️');
+            console.log(JSON.stringify(data, null, 2));               /* full payload */
+            fs.writeFileSync('raw-stats.json', JSON.stringify(data)); /* optional artefact */
+
+            const downloads =
+              data.organization?.packages.nodes[0]?.statistics?.downloadsTotalCount ?? 0;
+
+            core.notice(`downloadsTotalCount resolved to: ${downloads}`);
 
             const badge = {
               schemaVersion: 1,
               label: 'downloads',
               message: downloads.toString(),
-              color: 'blue'
+              color: downloads ? 'blue' : 'lightgrey'
             };
-
-            fs.writeFileSync('package-downloads-badge.json', JSON.stringify(badge, null, 2));
-            console.log(`Downloads → ${downloads}`);
+            fs.writeFileSync('package-downloads-badge.json',
+                             JSON.stringify(badge, null, 2));
 
       - name: Commit updated badge
         uses: EndBug/add-and-commit@v9
