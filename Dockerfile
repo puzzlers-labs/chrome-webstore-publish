@@ -1,6 +1,6 @@
 # This Dockerfile sets up a Node.js 22 environment with Chromium and pnpm on Alpine Linux.
 # It installs pnpm, configures its store, installs production dependencies, copies the app source,
-# sets up permissions, switches to an unprivileged user, adds a Chromium health check, and defines the start command.
+# sets up permissions, switches to an unprivileged user, and defines the start command.
 FROM timbru31/node-chrome:22-alpine
 
 # Switches to the root user to install pnpm and other configurations
@@ -29,3 +29,10 @@ RUN chown -R node:node /app
 
 # Switches to the unprivileged user
 USER node
+
+# Sets the PATH environment variable to include the local bin directory.
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Defines the default command to run when the container starts.
+# Runs the application using pnpm start.
+CMD ["pnpm", "start"]
