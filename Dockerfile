@@ -34,5 +34,5 @@ USER node
 ENV PATH="/usr/local/bin:${PATH}"
 
 # Defines the default command to run when the container starts.
-# Runs the application using pnpm start.
-CMD ["pnpm", "start"]
+# Runs the application using node src/index.js on /app.
+CMD ["node", "/app/src/index.js"]
