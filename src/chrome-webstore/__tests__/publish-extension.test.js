@@ -32,7 +32,8 @@ describe('publishExtension', () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const result = await publishExtension({ ...params, expeditedReview: true });
     expect(warnSpy).toHaveBeenCalledWith(
-      'Expedited review publish failed, falling back to regular review.'
+      'Expedited review publish failed, falling back to regular review.',
+      'expedite fail'
     );
     expect(result).toEqual({ status: ['OK'] });
     warnSpy.mockRestore();
