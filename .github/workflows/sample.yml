@@ -5,57 +5,60 @@ on:
     - cron: '0 0 * * *' # 00:00 UTC daily
   workflow_dispatch: # manual trigger
 
-env:
-  PACKAGE_OWNER: puzzlers-labs # org or user that owns the package
-  PACKAGE_NAME: chrome-webstore-publish # package name exactly as shown on GHCR
-
 jobs:
   update-badge:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
       - name: Fetch HTML
         run: curl -sL https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish -o page.html
 
-      - name: Set up Node 22
+      - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # install only the DOM/XPath libs
-      - run: |
-          npm --silent init -y
-          npm --silent install xmldom xpath
-
-      - name: Parse with XPath
-        id: scraper
-        uses: actions/github-script@v7
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          script: |
+          version: latest
+
+      - name: Install DOM/XPath libs
+        run: pnpm install xmldom xpath
+
+      - name: Parse with Node
+        id: scraper
+        run: |
+          value=$(node -e "
             const fs = require('fs');
-            const {DOMParser} = require('xmldom');
-            const xpath = require('xpath');
-
             const html = fs.readFileSync('page.html', 'utf8');
-            const doc  = new DOMParser({errorHandler:{}}).parseFromString(html, 'text/html');
-
-            const node = xpath.select1('/html/body/div[1]/div[6]/main/turbo-frame/div/div/div/div[2]/div[2]/div[2]/div[2]/div[1]/h3', doc);
-            const value = node?.firstChild?.data.trim() || '';
-
-            core.notice(`Scraped value ➜ ${value}`);
-            core.setOutput('scraped_value', value);
+            const match = html.match(/<span[^>]*>\\s*Total downloads\\s*<\\/span>\\s*<h3[^>]*>(\\d+)<\\/h3>/);
+            process.stdout.write(match ? match[1] : '');
+          ")
+          echo "scraped_value=$value" >> $GITHUB_OUTPUT
 
       - name: Show result
-        run: echo "::notice title=Scraped value::${{ steps.scraper.outputs.scrape_value }}"
+        run: echo "::notice title=Scraped value::${{ steps.scraper.outputs.scraped_value }}"
 
-      - name: Commit updated badge
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: 'package-downloads-badge.json'
-          author_name: 'puzzlers-tech[bot]'
-          author_email: 'tech@puzzlers-labs.com'
-          message: 'chore: refresh package download badge'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      scraped_value: ${{ steps.scraper.outputs.scraped_value }}
+
+  prepare-badge:
+    needs: update-badge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare badge JSON
+        run: |
+          VALUE="${{ needs.update-badge.outputs.scraped_value }}"
+          if [ -z "$VALUE" ]; then
+            VALUE="Error"
+          fi
+          cat > action-runs-badge.json <<EOF
+          {
+            "schemaVersion": 1,
+            "label": "Action Runs",
+            "message": "$VALUE",
+            "color": "blue"
+          }
+          EOF
+      - name: Show badge JSON
+        run: cat action-runs-badge.json
