@@ -10,4 +10,10 @@ node_modules
 .vscode
 Dockerfile
 README.md
+CONTRIBUTING.md
 action.yml
+
+# Ignore test files and directories
+src/__tests__/
+src/chrome-webstore/__tests__/
+*.test.js
