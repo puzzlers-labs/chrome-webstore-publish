@@ -211,7 +211,7 @@ jobs:
           retention-days: 7
 
   push-badges:
-    needs: [coverage, docker-build, tests, action-pulls]
+    needs: [coverage, docker-build, tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
