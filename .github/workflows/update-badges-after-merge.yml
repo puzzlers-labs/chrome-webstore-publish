@@ -1,0 +1,226 @@
+# This workflow updates status badges for coverage, Docker build, and tests after every manual trigger.
+# It runs in multiple jobs: initializes badges as failing, runs coverage, Docker build, and tests in parallel, and finally pushes the updated badges.
+# Artifacts are used to pass badge files between jobs, with a 7-day retention for debugging.
+
+name: Update Badges After Merge
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-badges:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Creates all badge JSON files with failing status
+      - name: Set all badges to failing
+        run: |
+          mkdir -p .github
+          echo '{ "schemaVersion": 1, "label": "Coverage", "message": "failed", "color": "red" }' > .github/coverage-badge.json
+          echo '{ "schemaVersion": 1, "label": "Docker Build", "message": "failed", "color": "red" }' > .github/docker-build-badge.json
+          echo '{ "schemaVersion": 1, "label": "Tests", "message": "failing", "color": "red" }' > .github/test-status-badge.json
+
+      # Uploads the badge files as an artifact for use in later jobs
+      - name: Upload badge artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: badges
+          path: .github/*.json
+          retention-days: 7
+
+  coverage:
+    needs: setup-badges
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # Checks out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Downloads the initial badge files
+      - name: Download badge artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: badges
+          path: .github
+
+      # Sets up Node.js for running tests
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Installs pnpm package manager
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Installs project dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Installs browsers for Puppeteer
+      - name: Install puppeteer browsers
+        run: pnpm dlx puppeteer browsers install
+
+      # Runs tests and generates the coverage badge JSON file
+      - name: Run tests and generate coverage badge
+        run: |
+          npx jest --coverage --coverageReporters=text-summary > coverage.txt
+          COVERAGE=$(grep -Po 'All files.*\K[0-9]+(?=%)' coverage.txt)
+          echo '{
+            "schemaVersion": 1,
+            "label": "coverage",
+            "message": "'"$COVERAGE"'%",
+            "color": "'"$( [ $COVERAGE -ge 90 ] && echo green || echo yellow )"'"
+          }' > .github/coverage-badge.json
+
+      # Uploads the updated coverage badge as an artifact
+      - name: Upload coverage badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: .github/coverage-badge.json
+          retention-days: 7
+
+  docker-build:
+    needs: setup-badges
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # Checks out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Downloads the initial badge files
+      - name: Download badge artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: badges
+          path: .github
+
+      # Builds the Docker image
+      - name: Build Docker image
+        id: docker_build
+        run: |
+          docker build -t my-image-name .
+
+      # Updates the Docker build badge if the build succeeds
+      - name: Set status to success if build passed
+        if: success()
+        run: |
+          echo '{
+            "schemaVersion": 1,
+            "label": "Docker Build",
+            "message": "passing",
+            "color": "green"
+          }' > .github/docker-build-badge.json
+
+      # Uploads the updated Docker build badge as an artifact
+      - name: Upload docker badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-badge
+          path: .github/docker-build-badge.json
+          retention-days: 7
+
+  tests:
+    needs: setup-badges
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # Checks out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Downloads the initial badge files
+      - name: Download badge artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: badges
+          path: .github
+
+      # Sets up Node.js for running tests
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Installs pnpm package manager
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Installs project dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Installs browsers for Puppeteer
+      - name: Install puppeteer browsers
+        run: pnpm dlx puppeteer browsers install
+
+      # Runs tests and updates the test badge based on the result
+      - name: Run tests and set test badge
+        run: |
+          pnpm test && STATUS=passing || STATUS=failing
+          COLOR=$( [ "$STATUS" = "passing" ] && echo green || echo red )
+          echo '{
+            "schemaVersion": 1,
+            "label": "Tests",
+            "message": "'"$STATUS"'",
+            "color": "'"$COLOR"'"
+          }' > .github/test-status-badge.json
+
+      # Uploads the updated test badge as an artifact
+      - name: Upload test badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-status-badge
+          path: .github/test-status-badge.json
+          retention-days: 7
+
+  push-badges:
+    needs: [coverage, docker-build, tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      # Checks out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Downloads the updated coverage badge
+      - name: Download coverage badge
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-badge
+          path: .github
+
+      # Downloads the updated Docker build badge
+      - name: Download Docker build badge
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-build-badge
+          path: .github
+
+      # Downloads the updated test badge
+      - name: Download test status badge
+        uses: actions/download-artifact@v4
+        with:
+          name: test-status-badge
+          path: .github
+
+      # Commits and pushes the updated badge files to the repository
+      - name: Commit and push badges
+        run: |
+          git config user.name "puzzlers-tech[bot]"
+          git config user.email "tech@puzzlers-labs.com"
+          git add .github/coverage-badge.json
+          git add .github/docker-build-badge.json
+          git add .github/test-status-badge.json
+          git commit -m "chore: update badges [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:main
