@@ -1,4 +1,14 @@
-name: Update package-download badge
+# This workflow updates the action runs badge by counting downloads from GHCR.
+# GHCR (GitHub Container Registry) is used for action runs, so 1 download equals 1 run.
+# For external runs, Docker pulls are used instead.
+# The workflow runs daily at 00:00 UTC and can also be triggered manually.
+# It fetches the total download count from the GHCR package page, prepares a badge JSON, and commits it to the repository.
+#
+# Jobs:
+# - get-download-count: Fetches the total download count from the GHCR package page.
+# - prepare-badge: Prepares the badge JSON and commits it to the repository.
+
+name: Update action runs badge
 
 on:
   schedule:
@@ -6,49 +16,57 @@ on:
   workflow_dispatch: # manual trigger
 
 jobs:
-  update-badge:
+  get-download-count:
     runs-on: ubuntu-latest
     steps:
+      # Downloads the HTML of the GHCR package page for parsing.
       - name: Fetch HTML
-        run: curl -sL https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish -o page.html
+        run: |
+          curl -sL "https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/pkgs/container/${{ github.event.repository.name }}" -o package_page.html
 
-      - name: Set up Node 20
+      # Sets up Node.js version 22 for running scripts.
+      - name: Set up Node 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
+      # Installs pnpm package manager.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
 
+      # Installs libraries needed to parse HTML and use XPath in Node.js.
       - name: Install DOM/XPath libs
         run: pnpm install xmldom xpath
 
+      # Parses the downloaded HTML to extract the total downloads count using Node.js.
       - name: Parse with Node
         id: scraper
         run: |
           value=$(node -e "
             const fs = require('fs');
-            const html = fs.readFileSync('page.html', 'utf8');
+            const html = fs.readFileSync('package_page.html', 'utf8');
             const match = html.match(/<span[^>]*>\\s*Total downloads\\s*<\\/span>\\s*<h3[^>]*>(\\d+)<\\/h3>/);
             process.stdout.write(match ? match[1] : '');
           ")
-          echo "scraped_value=$value" >> $GITHUB_OUTPUT
-
-      - name: Show result
-        run: echo "::notice title=Scraped value::${{ steps.scraper.outputs.scraped_value }}"
+          echo "total_downloads=$value" >> $GITHUB_OUTPUT
 
     outputs:
-      scraped_value: ${{ steps.scraper.outputs.scraped_value }}
+      total_downloads: ${{ steps.scraper.outputs.total_downloads }}
 
   prepare-badge:
-    needs: update-badge
+    needs: get-download-count
     runs-on: ubuntu-latest
     steps:
+      # Checks out the repository code for badge initialization
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Creates a badge JSON file with the download count or an error message.
       - name: Prepare badge JSON
         run: |
-          VALUE="${{ needs.update-badge.outputs.scraped_value }}"
+          VALUE="${{ needs.get-download-count.outputs.total_downloads }}"
           if [ -z "$VALUE" ]; then
             VALUE="Error"
           fi
@@ -60,5 +78,12 @@ jobs:
             "color": "blue"
           }
           EOF
-      - name: Show badge JSON
-        run: cat action-runs-badge.json
+
+      # Commits and pushes the updated badge JSON to the repository.
+      - name: Commit and push action runs badge
+        run: |
+          git config user.name "puzzlers-tech[bot]"
+          git config user.email "tech@puzzlers-labs.com"
+          git add .github/action-runs-badge.json
+          git commit -m "chore: update action runs badge [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:main
