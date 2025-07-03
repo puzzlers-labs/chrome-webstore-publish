@@ -195,8 +195,66 @@ jobs:
           path: .github/test-status-badge.json
           retention-days: 7
 
+  action-pulls:
+    needs: setup-badges
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      # Checks out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Downloads the initial badge files
+      - name: Download badge artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: badges
+          path: .github
+
+      # Queries the action pull count using GitHub GraphQL API
+      - name: Query action pull count
+        id: ghcr
+        uses: pcmarcin/octokit-graphql-action@v2
+        with:
+          query: |
+            query {
+              repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
+                containerRegistry {
+                  package(name: "${{ github.event.repository.name }}") {
+                    versions(first: 1, orderBy: {field: CREATED_AT, direction: DESC}) {
+                      nodes { pullCount }
+                    }
+                  }
+                }
+              }
+            }
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generates the action pulls badge JSON file
+      - name: Generate action pulls badge
+        run: |
+          PULLS=$(echo "${{ steps.ghcr.outputs.data }}" | jq '.repository.containerRegistry.package.versions.nodes[0].pullCount')
+          mkdir -p .github
+          cat <<EOF > .github/action-pulls-badge.json
+          {
+            "schemaVersion": 1,
+            "label": "Action Pulls",
+            "message": "${PULLS}",
+            "color": "blue"
+          }
+          EOF
+
+      # Uploads the action pulls badge as an artifact
+      - name: Upload action pulls badge
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: action-pulls-badge
+          path: .github/action-pulls-badge.json
+          retention-days: 7
+
   push-badges:
-    needs: [coverage, docker-build, tests]
+    needs: [coverage, docker-build, tests, action-pulls]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -225,6 +283,13 @@ jobs:
           name: test-status-badge
           path: .github
 
+      # Downloads the updated action pulls badge
+      - name: Download action pulls badge
+        uses: actions/download-artifact@v4
+        with:
+          name: action-pulls-badge
+          path: .github
+
       # Commits and pushes the updated badge files to the repository
       - name: Commit and push badges
         run: |
@@ -233,5 +298,6 @@ jobs:
           git add .github/coverage-badge.json
           git add .github/docker-build-badge.json
           git add .github/test-status-badge.json
+          git add .github/action-pulls-badge.json
           git commit -m "chore: update badges [skip ci]" || echo "No changes to commit"
           git push origin HEAD:main
