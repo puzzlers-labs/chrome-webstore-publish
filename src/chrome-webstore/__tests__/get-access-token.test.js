@@ -1,7 +1,8 @@
 // This file contains Jest tests for the getAccessToken function, which retrieves a Google OAuth2 access token using a refresh token.
 // The tests cover successful token retrieval, missing token in response, and error handling for failed requests.
-import { getAccessToken } from '@src/chrome-webstore';
+
 import axios from 'axios';
+import { getAccessToken } from '#src/chrome-webstore/index.js';
 
 jest.mock('axios');
 

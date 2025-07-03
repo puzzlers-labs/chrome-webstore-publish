@@ -1,7 +1,8 @@
 // This file contains Jest tests for the publishExtension function, which publishes a Chrome extension to the Web Store.
 // The tests cover expedited review, fallback to regular review, publish failures, and request errors.
-import { publishExtension } from '@src/chrome-webstore';
+
 import axios from 'axios';
+import { publishExtension } from '#src/chrome-webstore/index.js';
 
 jest.mock('axios');
 

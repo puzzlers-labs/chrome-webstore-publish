@@ -1,7 +1,8 @@
 // Tests for packCrxWithChrome, covering Chrome not found, packing failure, missing CRX file, and successful packing.
+
 import { execFileSync } from 'child_process';
 import fs from 'fs';
-import packCrxWithChrome from '../pack-crx-with-chrome.js';
+import packCrxWithChrome from '#src/pack-crx-with-chrome.js';
 
 jest.mock('fs');
 jest.mock('child_process');

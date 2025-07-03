@@ -1,13 +1,14 @@
 // This file contains an integration test for the packCrxWithChrome function.
 // It creates a temporary Chrome extension, generates a key, and verifies that the extension is packed into a CRX file using a real Chrome/Chromium binary.
 // The test ensures compatibility with the actual Chrome executable and checks for correct CRX output.
+
 import { execFileSync } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import packCrxWithChrome from '@src/pack-crx-with-chrome.js';
 import puppeteer from 'puppeteer';
+import packCrxWithChrome from '#src/pack-crx-with-chrome.js';
 
 // Integration test suite for packCrxWithChrome
 // Sets up a temporary extension directory and key, then tests CRX packaging
