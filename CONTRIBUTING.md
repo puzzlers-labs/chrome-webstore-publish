@@ -111,10 +111,10 @@ chrome-webstore-publish/
 - **Key Rules:**
   - Use single quotes for strings.
   - Always use semicolons.
-  - Alphabetical import order, with internal `@src` imports grouped after external.
+  - Alphabetical import order, with internal `#src` imports grouped after external.
   - Warn on unused variables (ignore those prefixed with `_`).
   - Console statements are allowed.
-  - No unresolved import errors for `@src` alias.
+  - No unresolved import errors for `#src` alias.
 - **EditorConfig:** 2 spaces per indent, LF line endings, auto-format on save.
 
 ---

@@ -6,8 +6,8 @@
 // - uploadExtension: Uploads a Chrome extension package to the Web Store.
 // - publishExtension: Publishes the uploaded extension to the specified target (public or testers).
 
-import getAccessToken from '@src/chrome-webstore/get-access-token.js';
-import publishExtension from '@src/chrome-webstore/publish-extension.js';
-import uploadExtension from '@src/chrome-webstore/upload-extension.js';
+import getAccessToken from '#src/chrome-webstore/get-access-token.js';
+import publishExtension from '#src/chrome-webstore/publish-extension.js';
+import uploadExtension from '#src/chrome-webstore/upload-extension.js';
 
 export { getAccessToken, uploadExtension, publishExtension };

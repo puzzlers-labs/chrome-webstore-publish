@@ -1,8 +1,9 @@
 // This file contains Jest tests for the uploadExtension function, which handles uploading a Chrome extension package to the Chrome Web Store.
 // The tests cover successful uploads, error handling for failed uploads, and request failures.
+
 import fs from 'fs';
-import { uploadExtension } from '@src/chrome-webstore';
 import axios from 'axios';
+import uploadExtension from '#src/chrome-webstore/upload-extension.js';
 
 jest.mock('axios');
 jest.mock('fs');

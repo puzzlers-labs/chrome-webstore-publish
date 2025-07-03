@@ -56,7 +56,7 @@ export default [
           ],
           pathGroups: [
             {
-              pattern: '@src/**',
+              pattern: '#src/**',
               group: 'internal',
               position: 'after',
             },
@@ -68,12 +68,12 @@ export default [
           },
           'newlines-between': 'never',
         },
-      ], // Enforces import order: package imports first (alphabetical), then internal @src imports.
-      // Ignores unresolved import errors for @src alias paths due to lack of flat config support.
+      ], // Enforces import order: package imports first (alphabetical), then internal #src imports.
+      // Ignores unresolved import errors for #src alias paths due to lack of flat config support.
       'import/no-unresolved': [
         'error',
         {
-          ignore: ['^@src/'],
+          ignore: ['^#src/'],
         },
       ],
       'n/no-missing-import': 'off', // Disables missing import rule for Node.js. This is the alias issue.

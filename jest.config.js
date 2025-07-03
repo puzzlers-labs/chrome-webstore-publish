@@ -8,7 +8,7 @@ export default {
     '^.+\\.js$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   moduleNameMapper: {
-    // Maps @src/ imports to the src directory for cleaner import statements
-    '^@src/(.*)$': '<rootDir>/src/$1',
+    // Maps #src/ imports to the src directory for cleaner import statements
+    '^#src/(.*)$': '<rootDir>/src/$1',
   },
 };

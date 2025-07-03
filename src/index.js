@@ -4,13 +4,12 @@
 // All errors are logged and cause the process to exit with a failure code.
 // The script is designed to be run as a standalone process.
 
-import 'module-alias/register';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { getAccessToken, publishExtension, uploadExtension } from '@src/chrome-webstore';
-import packCrxWithChrome from '@src/pack-crx-with-chrome.js';
 import unzipper from 'unzipper';
+import { getAccessToken, publishExtension, uploadExtension } from '#src/chrome-webstore/index.js';
+import packCrxWithChrome from '#src/pack-crx-with-chrome.js';
 
 // Main function to orchestrate the Chrome Web Store publishing process.
 // Handles input parsing, optional CRX packaging, authentication, upload, and publishing.
