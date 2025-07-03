@@ -1,5 +1,7 @@
 [![Chrome Webstore Push Banner](.github/images/hero.png)](https://github.com/marketplace/actions/chrome-webstore-publish)
 
+[![Test Status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/puzzlers-labs/chrome-webstore-publish/refs/heads/main/.github/test-status-badge.json)](https://github.com/puzzlers-labs/chrome-webstore-publish/actions/workflows/update-badges-after-merge.yml) [![Docker Build](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/puzzlers-labs/chrome-webstore-publish/refs/heads/main/.github/docker-build-badge.json)](https://github.com/puzzlers-labs/chrome-webstore-publish/actions/workflows/update-badges-after-merge.yml) [![Code Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/puzzlers-labs/chrome-webstore-publish/refs/heads/main/.github/coverage-badge.json)](https://github.com/puzzlers-labs/chrome-webstore-publish/actions/workflows/update-badges-after-merge.yml)
+
 # Chrome Webstore Publish GitHub Action
 
 GitHub Action to upload and publish Chrome extension ZIP or CRX files to the Chrome Web Store using the official Chrome Web Store API. Supports publishing to public or trusted testers, CRX signing, and expedited review process.
