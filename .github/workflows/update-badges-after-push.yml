@@ -2,9 +2,11 @@
 # It runs in multiple jobs: initializes badges as failing, runs coverage, Docker build, and tests in parallel, and finally pushes the updated badges.
 # Artifacts are used to pass badge files between jobs, with a 7-day retention for debugging.
 
-name: Update Badges After Merge
+name: Update Badges After Push
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
