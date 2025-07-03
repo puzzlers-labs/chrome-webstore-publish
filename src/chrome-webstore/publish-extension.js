@@ -61,7 +61,10 @@ async function publishExtension({
       return res.data;
     } catch (_err) {
       // Fall back to regular review if expedited fails
-      console.warn('Expedited review publish failed, falling back to regular review.');
+      console.warn(
+        'Expedited review publish failed, falling back to regular review.',
+        _err.response?.data?.error || _err.message
+      );
     }
   }
 
