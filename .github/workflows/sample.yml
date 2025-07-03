@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-        - name: Fetch HTML
+      - name: Fetch HTML
         run: curl -sL https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish -o page.html
 
       - name: Set up Node 22
