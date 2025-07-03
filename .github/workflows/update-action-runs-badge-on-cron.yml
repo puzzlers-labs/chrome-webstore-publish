@@ -8,7 +8,7 @@
 # - get-download-count: Fetches the total download count from the GHCR package page.
 # - prepare-badge: Prepares the badge JSON and commits it to the repository.
 
-name: Update action runs badge
+name: Update Action Runs Badge on CRON
 
 on:
   schedule:
@@ -70,7 +70,7 @@ jobs:
           if [ -z "$VALUE" ]; then
             VALUE="Error"
           fi
-          cat > action-runs-badge.json <<EOF
+          cat > .github/action-runs-badge.json <<EOF
           {
             "schemaVersion": 1,
             "label": "Action Runs",
