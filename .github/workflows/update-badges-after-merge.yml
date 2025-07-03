@@ -33,7 +33,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: badges
-          path: .github/*.json
+          path: |
+            .github/coverage-badge.json
+            .github/docker-build-badge.json
+            .github/test-status-badge.json
           retention-days: 7
 
   coverage:
@@ -87,6 +90,7 @@ jobs:
       # Uploads the updated coverage badge as an artifact
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: coverage-badge
           path: .github/coverage-badge.json
@@ -128,6 +132,7 @@ jobs:
       # Uploads the updated Docker build badge as an artifact
       - name: Upload docker badge
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: docker-build-badge
           path: .github/docker-build-badge.json
@@ -184,6 +189,7 @@ jobs:
       # Uploads the updated test badge as an artifact
       - name: Upload test badge
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: test-status-badge
           path: .github/test-status-badge.json
