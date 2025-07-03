@@ -67,7 +67,7 @@ inputs:
 runs:
   using: 'docker'
   image: 'ghcr.io/puzzlers-labs/chrome-webstore-publish:latest'
-  entrypoint: ['pnpm', 'start']
+  entrypoint: 'pnpm start'
 
 # Customizes the action's appearance in the GitHub Actions UI.
 branding:
