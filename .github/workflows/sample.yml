@@ -16,55 +16,58 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch download stats & write JSON (verbose)
-        uses: actions/github-script@v7
-        env:
-          DEBUG: 'true'
+      # 1. Grab the raw HTML
+      - name: Download package page
+        run: |
+          curl -sL \
+            https://github.com/puzzlers-labs/chrome-webstore-publish/pkgs/container/chrome-webstore-publish \
+            -o page.html
+
+      # 2. Set up Node (v22 because that’s what you’re using elsewhere)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          script: |
-            const fs = require('node:fs');          // ✅ still fine
+          node-version: '22'
 
-            const query = `
-              query ($owner: String!, $pkg: String!) {
-                organization(login: $owner) {
-                  packages(first: 1, names: [$pkg]) {
-                    nodes {
-                      name
-                      statistics { downloadsTotalCount }
-                    }
-                  }
-                }
-              }`;
+      # 3. Install lightweight DOM + XPath libs and extract the value
+      - name: Run scraper
+        id: scraper
+        run: |
+          npm --silent install xmldom xpath
+          node - <<'NODE'
+            const fs   = require('fs');
+            const core = require('@actions/core');
+            const {DOMParser} = require('xmldom');
+            const xpath = require('xpath');
 
-            const vars = {
-              owner: process.env.PACKAGE_OWNER,
-              pkg:   process.env.PACKAGE_NAME,
-            };
+            // load the HTML
+            const html = fs.readFileSync('page.html', 'utf8');
 
-            /* ------------ EXECUTE ------------- */
-            const data = await github.graphql(query, vars);
+            // parse as lenient HTML-ish XML
+            const doc  = new DOMParser({
+              errorHandler: { // swallow HTML-mismatch warnings
+                warning(){}, error(){}, fatalError(){}
+              }
+            }).parseFromString(html, 'text/html');
 
-            /* ------------ LOGGING ------------- */
-            core.notice('Raw GraphQL response ⬇️');      // core is already in scope
-            console.log(JSON.stringify(data, null, 2));
-            fs.writeFileSync('raw-stats.json', JSON.stringify(data));
-
-            const downloads =
-              data.organization?.packages.nodes[0]?.statistics?.downloadsTotalCount ?? 0;
-
-            core.notice(`downloadsTotalCount → ${downloads}`);
-
-            const badge = {
-              schemaVersion: 1,
-              label: 'downloads',
-              message: downloads.toString(),
-              color: downloads ? 'blue' : 'lightgrey',
-            };
-
-            fs.writeFileSync(
-              'package-downloads-badge.json',
-              JSON.stringify(badge, null, 2),
+            // evaluate the supplied XPath
+            const node = xpath.select1(
+              '/html/body/div[1]/div[6]/main/turbo-frame/div/div/div/div[2]/div[2]/div[2]/div[2]/div[1]/h3',
+              doc
             );
+
+            const value = node?.firstChild?.data.trim() ?? '';
+            console.log(`Scraped value → "${value}"`);
+
+            // expose as step output for later steps / workflow outputs
+            core.setOutput('scraped_value', value);
+          NODE
+
+      # 4. Use the value (example)
+      - name: Print result
+        run: echo "::notice title=Scraped value::$SCRAPED"
+        env:
+          SCRAPED: ${{ steps.scraper.outputs.scraped_value }}
 
       - name: Commit updated badge
         uses: EndBug/add-and-commit@v9
