@@ -78,6 +78,8 @@ async function run() {
       console.log('CRX package created:', packageFilePath);
     }
 
+    console.log('Package file path:', packageFilePath);
+
     // Requests an OAuth2 access token using the provided credentials.
     console.log('Requesting access token...');
     const accessToken = await getAccessToken({
