@@ -52,7 +52,7 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2
       puppeteer:
-        specifier: ^24.11.2
+        specifier: ^24.12.1
         version: 24.12.1(typescript@5.8.3)
 
 packages:
