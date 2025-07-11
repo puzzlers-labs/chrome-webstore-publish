@@ -78,11 +78,11 @@ jobs:
 
       # Installs project dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       # Installs browsers required for Puppeteer tests
       - name: Install puppeteer browsers
-        run: pnpm dlx puppeteer browsers install
+        run: pnpm exec puppeteer browsers install
 
       # Runs tests and generates a coverage report
       - name: Run tests and generate coverage report
@@ -192,11 +192,11 @@ jobs:
 
       # Installs project dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       # Installs browsers required for Puppeteer tests
       - name: Install puppeteer browsers
-        run: pnpm dlx puppeteer browsers install
+        run: pnpm exec puppeteer browsers install
 
       # Runs tests and sets the test badge based on the result
       - name: Run tests and set test badge

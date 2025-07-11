@@ -31,7 +31,7 @@ jobs:
 
       # Installs all project dependencies using pnpm.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       # Runs the linter to check for code style and quality issues.
       - name: Run linter
@@ -58,11 +58,11 @@ jobs:
 
       # Installs all project dependencies using pnpm.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       # Installs the browsers for puppeteer to use.
       - name: Install puppeteer browsers
-        run: pnpm dlx puppeteer browsers install
+        run: pnpm exec puppeteer browsers install
 
       # Runs the test suite to check for correctness.
       - name: Run tests
