@@ -43,11 +43,6 @@ async function run() {
       resolvedZipFilePath = path.join('/github/workspace', zipFilePath);
     }
 
-    console.log('Zip file path:', zipFilePath);
-    console.log('Is absolute:', path.isAbsolute(zipFilePath));
-    console.log('Resolved zip file path:', resolvedZipFilePath);
-    console.log('File List:', fs.readdirSync('/github/workspace'));
-
     let resolvedCrxPrivateKeyPath = crxPrivateKeyPath;
     if (crxPrivateKeyPath && !path.isAbsolute(crxPrivateKeyPath)) {
       resolvedCrxPrivateKeyPath = path.join('/github/workspace', crxPrivateKeyPath);
@@ -77,8 +72,6 @@ async function run() {
       packageFilePath = await packCrxWithChrome(tmpDir, privateKeyPath);
       console.log('CRX package created:', packageFilePath);
     }
-
-    console.log('Package file path:', packageFilePath);
 
     // Requests an OAuth2 access token using the provided credentials.
     console.log('Requesting access token...');
