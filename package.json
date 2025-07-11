@@ -1,6 +1,6 @@
 {
   "name": "chrome-webstore-publish",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "author": "Puzzlers Labs",
   "description": "GitHub Action to upload and publish Chrome extensions to the Chrome Web Store via API.",
   "license": "Apache-2.0",
