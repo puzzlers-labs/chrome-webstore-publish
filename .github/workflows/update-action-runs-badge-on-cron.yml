@@ -47,7 +47,7 @@ jobs:
           value=$(node -e "
             const fs = require('fs');
             const html = fs.readFileSync('package_page.html', 'utf8');
-            const match = html.match(/<span[^>]*>\\s*Total downloads\\s*<\\/span>\\s*<h3[^>]*>(\\d+)<\\/h3>/);
+            const match = html.match(/<span[^>]*>\\s*Total downloads\\s*<\\/span>\\s*<h3[^>]*>(.*)?<\\/h3>/);
             process.stdout.write(match ? match[1] : '');
           ")
           echo "total_downloads=$value" >> $GITHUB_OUTPUT
