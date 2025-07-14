@@ -41,6 +41,8 @@ async function packCrxWithChrome(
     execFileSync(chromePath, [
       '--headless',
       '--no-sandbox',
+      '--disable-crash-reporter',
+      '--no-crashpad',
       `--pack-extension=${unpackedDir}`,
       `--pack-extension-key=${privateKeyPath}`,
     ]);
