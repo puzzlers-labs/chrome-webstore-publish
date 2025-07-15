@@ -27,6 +27,8 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
     throw new Error('accessToken is required and must be a non-empty string');
   }
 
+  console.log('Package file path:', packageFilePath);
+
   const url = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}`;
   const fileStream = fs.createReadStream(packageFilePath);
   // Determine Content-Type based on file extension
@@ -40,7 +42,6 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'x-goog-api-version': '2',
-        'Content-Type': contentType,
       },
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
