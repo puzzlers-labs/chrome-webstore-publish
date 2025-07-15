@@ -18,6 +18,7 @@ RUN mkdir -p /opt/.pnpm-store
 # Creates the crashes and chromium database directories in /tmp.
 RUN mkdir -p /tmp/crashes && chmod 777 /tmp/crashes
 RUN mkdir -p /tmp/.chromium && chmod 777 /tmp/.chromium
+RUN mkdir -p /github/workspace/chrome-webstore-publish-artifacts && chmod 666 /github/workspace/chrome-webstore-publish-artifacts
 
 WORKDIR /app
 

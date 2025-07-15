@@ -85,17 +85,15 @@ async function run() {
       const fileName = path.basename(packageFilePath);
       const destPath = path.join(artifactDir, fileName);
       fs.copyFileSync(packageFilePath, destPath);
-      console.log(`Package artifact saved at: ${destPath}`);
-      console.log('List of files in artifact directory:', fs.readdirSync(artifactDir));
+      // Set file permissions to read/write for all users (not execute)
+      fs.chmodSync(destPath, 0o666);
       savedArtifactPath = destPath;
-      // Print the path so users can access it in later steps
-      console.log(`::set-output name=package-artifact-path::${actionDirectory}/${fileName}`);
       // Use environment file to set output (GitHub Actions best practice)
-      // const outputEnv = process.env.GITHUB_OUTPUT;
-      // if (outputEnv) {
-      //   fs.appendFileSync(outputEnv, `package-artifact-path=${destPath}\n`);
-      // }
-      // console.log(`Package artifact saved at: ${destPath}`);
+      const outputEnv = process.env.GITHUB_OUTPUT;
+      if (outputEnv) {
+        fs.appendFileSync(outputEnv, `package-artifact-path=${destPath}\n`);
+      }
+      console.log(`Package artifact saved at: ${destPath}`);
     }
 
     // Unpack ZIP to a temp directory and check for manifest.json before any upload or CRX packaging.
