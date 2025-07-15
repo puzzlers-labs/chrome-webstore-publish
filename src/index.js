@@ -77,17 +77,25 @@ async function run() {
     // Save the signed package as an artifact if requested
     let savedArtifactPath = null;
     if (savePackageArtifact) {
-      const artifactDir = path.resolve('chrome-webstore-publish-artifacts');
+      const actionDirectory = 'chrome-webstore-publish-artifacts';
+      const artifactDir = path.resolve(actionDirectory);
       if (!fs.existsSync(artifactDir)) {
         fs.mkdirSync(artifactDir, { recursive: true });
       }
       const fileName = path.basename(packageFilePath);
       const destPath = path.join(artifactDir, fileName);
       fs.copyFileSync(packageFilePath, destPath);
+      console.log(`Package artifact saved at: ${destPath}`);
+      console.log('List of files in artifact directory:', fs.readdirSync(artifactDir));
       savedArtifactPath = destPath;
       // Print the path so users can access it in later steps
-      console.log(`::set-output name=package-artifact-path::${destPath}`);
-      console.log(`Package artifact saved at: ${destPath}`);
+      console.log(`::set-output name=package-artifact-path::${actionDirectory}/${fileName}`);
+      // Use environment file to set output (GitHub Actions best practice)
+      // const outputEnv = process.env.GITHUB_OUTPUT;
+      // if (outputEnv) {
+      //   fs.appendFileSync(outputEnv, `package-artifact-path=${destPath}\n`);
+      // }
+      // console.log(`Package artifact saved at: ${destPath}`);
     }
 
     // Unpack ZIP to a temp directory and check for manifest.json before any upload or CRX packaging.
