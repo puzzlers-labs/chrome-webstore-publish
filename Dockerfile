@@ -32,6 +32,9 @@ RUN chown -R node:node /app
 # Switches to the unprivileged user
 USER node
 
+ENV XDG_CONFIG_HOME=/tmp/.chromium
+ENV XDG_CACHE_HOME=/tmp/.chromium
+
 # Sets the PATH environment variable to include the local bin directory.
 ENV PATH="/usr/local/bin:${PATH}"
 
