@@ -25,17 +25,18 @@ GitHub Action to upload and publish Chrome extension ZIP or CRX files to the Chr
 
 ## Inputs
 
-| Name                   | Description                                                                                                      | Required               |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| `extension_id`         | The Chrome Web Store extension ID                                                                                | Yes                    |
-| `zip_file_path`        | Path to the extension ZIP file                                                                                   | Yes                    |
-| `client_id`            | Google Cloud OAuth2 client ID                                                                                    | Yes                    |
-| `client_secret`        | Google Cloud OAuth2 client secret                                                                                | Yes                    |
-| `refresh_token`        | OAuth2 refresh token of the user that has access to webstore api scope.                                          | Yes                    |
-| `publish_target`       | Publish target: `public` or `testers`                                                                            | No (default: `public`) |
-| `expedited_review`     | Request expedited review if eligible (true/false). Falls back to regular review if not eligible.                 | No (default: `false`)  |
-| `crx_private_key`      | CRX signing private key (PEM string). If provided, the extension will be signed and uploaded as a CRX.           | No                     |
-| `crx_private_key_path` | Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as a CRX. | No                     |
+| Name                    | Description                                                                                                                 | Required               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `extension_id`          | The Chrome Web Store extension ID                                                                                           | Yes                    |
+| `zip_file_path`         | Path to the extension ZIP file                                                                                              | Yes                    |
+| `client_id`             | Google Cloud OAuth2 client ID                                                                                               | Yes                    |
+| `client_secret`         | Google Cloud OAuth2 client secret                                                                                           | Yes                    |
+| `refresh_token`         | OAuth2 refresh token of the user that has access to webstore api scope.                                                     | Yes                    |
+| `publish_target`        | Publish target: `public` or `testers`                                                                                       | No (default: `public`) |
+| `expedited_review`      | Request expedited review if eligible (true/false). Falls back to regular review if not eligible.                            | No (default: `false`)  |
+| `crx_private_key`       | CRX signing private key (PEM string). If provided, the extension will be signed and uploaded as a CRX.                      | No                     |
+| `crx_private_key_path`  | Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as a CRX.            | No                     |
+| `save_package_artifact` | If true, saves the package (CRX or ZIP) to chrome-webstore-publish-artifacts and outputs its path as package-artifact-path. | No (default: `false`)  |
 
 > **Note:** Only one of `crx_private_key` or `crx_private_key_path` should be provided. If neither is provided, the extension is uploaded as a ZIP.
 
@@ -61,10 +62,21 @@ jobs:
           refresh_token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           publish_target: public # Or `testers` for internal publishing target to TrustedTesters.
           expedited_review: true # This does not guarantee an expedited Review process. But it makes an attempt.
+          save_package_artifact: true # Save the signed package (CRX or ZIP) as an artifact for later use
           # Only one of the following should be provided:
           # crx_private_key: ${{ secrets.CRX_PRIVATE_KEY }}
           # crx_private_key_path: ./path/to/key.pem
+
+      # Example: Use the output path in a later step
+      - name: Use package artifact path
+        run: echo "Package artifact path: ${{ steps.<step_id>.outputs.package-artifact-path }}"
 ```
+
+## Outputs
+
+| Name                    | Description                                                               |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `package-artifact-path` | Path to the saved package (CRX or ZIP) if `save_package_artifact` is true |
 
 ## Error Handling & Logs
 
