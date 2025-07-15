@@ -15,6 +15,8 @@ RUN mkdir -p /opt/.pnpm-store
 # Sets ownership of the pnpm store to the node user
 RUN chown -R node:node /opt/.pnpm-store
 
+RUN mkdir -p /tmp/crashes && chmod 777 /tmp/crashes
+
 WORKDIR /app
 
 # Copies dependency lock files for better Docker layer caching

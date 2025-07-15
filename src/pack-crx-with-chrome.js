@@ -43,6 +43,7 @@ async function packCrxWithChrome(
       '--no-sandbox',
       '--disable-crash-reporter',
       '--no-crashpad',
+      '--crash-dumps-dir=/tmp/crashes',
       `--pack-extension=${unpackedDir}`,
       `--pack-extension-key=${privateKeyPath}`,
     ]);
