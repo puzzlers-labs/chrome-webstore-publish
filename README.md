@@ -52,7 +52,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Publish to Chrome Web Store
+        id: publish-chrome-extension
         uses: puzzlers-labs/chrome-webstore-publish@v1
         with:
           extension_id: ${{ vars.CHROME_EXTENSION_ID }}
@@ -69,7 +71,7 @@ jobs:
 
       # Example: Use the output path in a later step
       - name: Use package artifact path
-        run: echo "Package artifact path: ${{ steps.<step_id>.outputs.package-artifact-path }}"
+        run: echo "Package artifact path: ${{ steps.publish-chrome-extension.outputs.package-artifact-path }}"
 ```
 
 ## Outputs
