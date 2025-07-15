@@ -73,6 +73,20 @@ async function run() {
       console.log('CRX package created:', packageFilePath);
     }
 
+    // Unpack ZIP to a temp directory and check for manifest.json before any upload or CRX packaging.
+    const manifestCheckTmpDir = fs.mkdtempSync(`${os.tmpdir()}/manifest-check-`);
+    await fs
+      .createReadStream(resolvedZipFilePath)
+      .pipe(unzipper.Extract({ path: manifestCheckTmpDir }))
+      .promise();
+    const manifestPath = path.join(manifestCheckTmpDir, 'manifest.json');
+    if (!fs.existsSync(manifestPath)) {
+      // Throws an error if manifest.json is not found at the root of the extracted ZIP.
+      throw new Error(
+        'Invalid extension ZIP: manifest.json not found at the root. Please check the ZIP file.'
+      );
+    }
+
     // Requests an OAuth2 access token using the provided credentials.
     console.log('Requesting access token...');
     const accessToken = await getAccessToken({
