@@ -97,6 +97,8 @@ async function run() {
     console.log('Access token obtained.');
 
     // Uploads the extension package (ZIP or CRX) to the Chrome Web Store.
+    console.log('About to upload file:', packageFilePath);
+    console.log('File extension for upload:', path.extname(packageFilePath));
     console.log('Uploading extension...');
     await uploadExtension({ extensionId, packageFilePath, accessToken });
     console.log('Extension uploaded.');
