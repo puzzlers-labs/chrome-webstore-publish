@@ -35,6 +35,9 @@ async function packCrxWithChrome(
     throw new Error('Chromium not found at ' + chromePath + ' in the Docker container.');
   }
 
+  console.log('Unpacked extension directory:', unpackedDir);
+  console.log('Directory contents:', JSON.stringify(fs.readdirSync(unpackedDir), null, 2));
+
   // Attempt to pack the extension directory into a CRX file using Chromium
   try {
     console.log('Packing extension directory into CRX...');
