@@ -61,6 +61,12 @@ inputs:
     description: 'Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as a CRX.'
     required: false
 
+  # If true, saves the package (CRX or ZIP) to chrome-webstore-publish-artifacts and outputs its path
+  save_package_artifact:
+    description: 'If true, saves the package (CRX or ZIP) to chrome-webstore-publish-artifacts and outputs its path as package-artifact-path.'
+    required: false
+    default: 'false'
+
 # Specifies Docker as the runtime environment
 # and uses the Docker image from GitHub Container Registry (GHCR).
 # The entrypoint is set to 'pnpm start' to run the application.

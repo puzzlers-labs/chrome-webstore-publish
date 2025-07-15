@@ -28,6 +28,7 @@ async function run() {
     const expeditedReview = process.env.INPUT_EXPEDITED_REVIEW === 'true';
     const crxPrivateKey = process.env.INPUT_CRX_PRIVATE_KEY;
     const crxPrivateKeyPath = process.env.INPUT_CRX_PRIVATE_KEY_PATH;
+    const savePackageArtifact = process.env.INPUT_SAVE_PACKAGE_ARTIFACT === 'true';
 
     if (!extensionId || !zipFilePath || !clientId || !clientSecret || !refreshToken) {
       throw new Error('Missing one or more required environment variables.');
@@ -71,6 +72,22 @@ async function run() {
       // Pack CRX
       packageFilePath = await packCrxWithChrome(tmpDir, privateKeyPath);
       console.log('CRX package created:', packageFilePath);
+    }
+
+    // Save the signed package as an artifact if requested
+    let savedArtifactPath = null;
+    if (savePackageArtifact) {
+      const artifactDir = path.join('/github/workspace', 'chrome-webstore-publish-artifacts');
+      if (!fs.existsSync(artifactDir)) {
+        fs.mkdirSync(artifactDir, { recursive: true });
+      }
+      const fileName = path.basename(packageFilePath);
+      const destPath = path.join(artifactDir, fileName);
+      fs.copyFileSync(packageFilePath, destPath);
+      savedArtifactPath = destPath;
+      // Print the path so users can access it in later steps
+      console.log(`::set-output name=package-artifact-path::${destPath}`);
+      console.log(`Package artifact saved at: ${destPath}`);
     }
 
     // Unpack ZIP to a temp directory and check for manifest.json before any upload or CRX packaging.
