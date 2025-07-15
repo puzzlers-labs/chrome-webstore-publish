@@ -91,7 +91,7 @@ async function run() {
       // Use environment file to set output (GitHub Actions best practice)
       const outputEnv = process.env.GITHUB_OUTPUT;
       if (outputEnv) {
-        fs.appendFileSync(outputEnv, `package-artifact-path=${destPath}\n`);
+        fs.appendFileSync(outputEnv, `package-artifact-path=${actionDirectory}/${fileName}\n`);
       }
       console.log(`Package artifact saved at: ${destPath}`);
     }
