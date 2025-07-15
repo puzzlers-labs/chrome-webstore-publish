@@ -15,7 +15,9 @@ RUN mkdir -p /opt/.pnpm-store
 # Sets ownership of the pnpm store to the node user
 RUN chown -R node:node /opt/.pnpm-store
 
+# Creates the crashes and chromium database directories in /tmp.
 RUN mkdir -p /tmp/crashes && chmod 777 /tmp/crashes
+RUN mkdir -p /tmp/.chromium && chmod 777 /tmp/.chromium
 
 WORKDIR /app
 
@@ -32,6 +34,8 @@ RUN chown -R node:node /app
 # Switches to the unprivileged user
 USER node
 
+# Sets the XDG_CONFIG_HOME and XDG_CACHE_HOME environment variables to /tmp/.chromium.
+# These directories and environment variables are needed for Chromium to work.
 ENV XDG_CONFIG_HOME=/tmp/.chromium
 ENV XDG_CACHE_HOME=/tmp/.chromium
 
