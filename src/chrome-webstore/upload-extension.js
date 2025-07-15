@@ -33,6 +33,7 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
   const contentType = packageFilePath.endsWith('.crx')
     ? 'application/x-chrome-extension'
     : 'application/zip';
+  console.log('Content-Type:', contentType);
   try {
     console.log('Uploading extension package to Chrome Web Store...');
     const res = await axios.put(url, fileStream, {
