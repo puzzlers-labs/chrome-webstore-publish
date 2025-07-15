@@ -29,19 +29,20 @@ async function uploadExtensionPackage({ extensionId, packageFilePath, accessToke
 
   console.log('Package file path:', packageFilePath);
 
-  const url = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}`;
+  const url = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}?uploadType=media`;
   const fileStream = fs.createReadStream(packageFilePath);
   // Determine Content-Type based on file extension
-  const contentType = packageFilePath.endsWith('.crx')
-    ? 'application/x-chrome-extension'
-    : 'application/zip';
-  console.log('Content-Type:', contentType);
+  // const contentType = packageFilePath.endsWith('.crx')
+  //   ? 'application/x-chrome-extension'
+  //   : 'application/zip';
+  // console.log('Content-Type:', contentType);
   try {
     console.log('Uploading extension package to Chrome Web Store...');
     const res = await axios.put(url, fileStream, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'x-goog-api-version': '2',
+        'Content-Type': 'application/octet-stream',
       },
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
