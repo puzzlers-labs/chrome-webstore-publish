@@ -41,12 +41,12 @@ async function run() {
     // Normalize zip file path to ensure it works inside Docker
     let resolvedZipFilePath = zipFilePath;
     if (!path.isAbsolute(zipFilePath)) {
-      resolvedZipFilePath = path.join('/github/workspace', zipFilePath);
+      resolvedZipFilePath = path.resolve(zipFilePath);
     }
 
     let resolvedCrxPrivateKeyPath = crxPrivateKeyPath;
     if (crxPrivateKeyPath && !path.isAbsolute(crxPrivateKeyPath)) {
-      resolvedCrxPrivateKeyPath = path.join('/github/workspace', crxPrivateKeyPath);
+      resolvedCrxPrivateKeyPath = path.resolve(crxPrivateKeyPath);
     }
 
     let packageFilePath = resolvedZipFilePath;
@@ -77,7 +77,7 @@ async function run() {
     // Save the signed package as an artifact if requested
     let savedArtifactPath = null;
     if (savePackageArtifact) {
-      const artifactDir = path.join('/github/workspace', 'chrome-webstore-publish-artifacts');
+      const artifactDir = path.resolve('chrome-webstore-publish-artifacts');
       if (!fs.existsSync(artifactDir)) {
         fs.mkdirSync(artifactDir, { recursive: true });
       }
