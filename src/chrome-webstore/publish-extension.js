@@ -8,19 +8,18 @@ import axios from 'axios';
 /**
  * Publishes an extension to the public or to trusted testers, with optional expedited review fallback.
  * Validates required parameters and constructs the correct API endpoint using the request body for publish options.
- * @param {Object} params - Parameters for publishing the extension.
- * @param {string} params.extensionId - The Chrome extension ID.
- * @param {string} params.accessToken - OAuth2 access token for authentication.
- * @param {('trustedTesters'|'default')} params.publishTarget - 'trustedTesters' or 'default' for public. Default is 'default'.
- * @param {boolean} params.expeditedReview - Whether to request expedited review first. Default is false.
+ * @param {string} extensionId - The Chrome extension ID.
+ * @param {string} accessToken - OAuth2 access token for authentication.
+ * @param {('trustedTesters'|'default')} publishTarget - 'trustedTesters' or 'default' for public. Default is 'default'.
+ * @param {boolean} expeditedReview - Whether to request expedited review first. Default is false.
  * @returns {Promise<Object>} - The response from the publish API.
  */
-async function publishExtension({
+async function publishExtension(
   extensionId,
   accessToken,
   publishTarget = 'default',
-  expeditedReview = false,
-}) {
+  expeditedReview = false
+) {
   // Validate required parameters
   if (!extensionId || typeof extensionId !== 'string') {
     throw new Error('extensionId (string) is required');
@@ -60,7 +59,7 @@ async function publishExtension({
       console.log('Expedited review publish successful.');
       return res.data;
     } catch (_err) {
-      // Fall back to regular review if expedited fails
+      // Fallback to regular review if expedited fails
       console.warn(
         'Expedited review publish failed, falling back to regular review.',
         _err.response?.data?.error || _err.message
