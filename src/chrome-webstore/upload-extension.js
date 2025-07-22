@@ -17,13 +17,16 @@ import axios from 'axios';
  */
 async function uploadExtensionPackage(extensionId, accessToken, packageFilePath) {
   // Validate required parameters
-  if (!extensionId || typeof extensionId !== 'string') {
+  if (!extensionId || typeof extensionId !== 'string' || !extensionId.trim()) {
+    console.error('extensionId is required and must be a non-empty string');
     throw new Error('extensionId is required and must be a non-empty string');
   }
-  if (!packageFilePath || typeof packageFilePath !== 'string') {
+  if (!packageFilePath || typeof packageFilePath !== 'string' || !packageFilePath.trim()) {
+    console.error('packageFilePath is required and must be a non-empty string');
     throw new Error('packageFilePath is required and must be a non-empty string');
   }
-  if (!accessToken || typeof accessToken !== 'string') {
+  if (!accessToken || typeof accessToken !== 'string' || !accessToken.trim()) {
+    console.error('accessToken is required and must be a non-empty string');
     throw new Error('accessToken is required and must be a non-empty string');
   }
 
@@ -52,13 +55,14 @@ async function uploadExtensionPackage(extensionId, accessToken, packageFilePath)
       maxBodyLength: Infinity,
     });
     if (res.data.uploadState !== 'SUCCESS') {
+      console.error('Upload failed:', JSON.stringify(res.data));
       throw new Error(`Upload failed: ${JSON.stringify(res.data)}`);
     }
 
     console.log('Extension package uploaded successfully.');
     return res.data;
   } catch (err) {
-    console.error('Failed to upload extension package:', err);
+    console.error('Failed to upload extension package:', err.response?.data?.error || err.message);
     throw new Error(`Failed to upload extension: ${err.response?.data?.error || err.message}`);
   }
 }
