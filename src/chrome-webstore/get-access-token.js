@@ -15,13 +15,16 @@ import qs from 'qs';
  */
 async function getAccessToken(clientId, clientSecret, refreshToken) {
   // Validate required arguments
-  if (!clientId || typeof clientId !== 'string') {
+  if (!clientId || typeof clientId !== 'string' || !clientId.trim()) {
+    console.error('clientId is required and must be a non-empty string');
     throw new Error('clientId is required and must be a non-empty string');
   }
-  if (!clientSecret || typeof clientSecret !== 'string') {
+  if (!clientSecret || typeof clientSecret !== 'string' || !clientSecret.trim()) {
+    console.error('clientSecret is required and must be a non-empty string');
     throw new Error('clientSecret is required and must be a non-empty string');
   }
-  if (!refreshToken || typeof refreshToken !== 'string') {
+  if (!refreshToken || typeof refreshToken !== 'string' || !refreshToken.trim()) {
+    console.error('refreshToken is required and must be a non-empty string');
     throw new Error('refreshToken is required and must be a non-empty string');
   }
 
@@ -41,13 +44,17 @@ async function getAccessToken(clientId, clientSecret, refreshToken) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     if (!res.data.access_token) {
+      console.error('No access_token in response');
       throw new Error('No access_token in response');
     }
 
     console.log('Access token successfully retrieved.');
     return res.data.access_token;
   } catch (err) {
-    console.error('Failed to get access token:', err);
+    console.error(
+      'Failed to get access token:',
+      err.response?.data?.error_description || err.message
+    );
     throw new Error(
       `Failed to get access token: ${err.response?.data?.error_description || err.message}`
     );
