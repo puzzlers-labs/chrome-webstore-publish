@@ -12,13 +12,16 @@ RUN npm install -g pnpm
 RUN pnpm config set store-dir /opt/.pnpm-store
 # Creates the pnpm store directory
 RUN mkdir -p /opt/.pnpm-store
-# Sets ownership of the pnpm store to the root user
-# RUN chown -R root:root /opt/.pnpm-store
 
-# Creates the crashes and chromium database directories in /tmp.
-RUN mkdir -p /tmp/crashes && chmod 777 /tmp/crashes
-RUN mkdir -p /tmp/.chromium && chmod 777 /tmp/.chromium
-RUN mkdir -p /github/workspace/chrome-webstore-publish-artifacts && chmod 666 /github/workspace/chrome-webstore-publish-artifacts
+# Creates the directories for the crashes, chromium database and output artifacts.
+RUN mkdir -p /tmp/crashes
+RUN mkdir -p /tmp/.chromium
+RUN mkdir -p /github/workspace/chrome-webstore-publish-artifacts
+
+# Sets the permissions for the directories.
+RUN chmod 777 /tmp/crashes
+RUN chmod 777 /tmp/.chromium
+RUN chmod 666 /github/workspace/chrome-webstore-publish-artifacts
 
 WORKDIR /app
 
@@ -29,8 +32,6 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Copies the application source code into the image
 COPY . .
-# Ensures the app directory is owned by the root user
-# RUN chown -R root:root /app
 
 # Sets the XDG_CONFIG_HOME and XDG_CACHE_HOME environment variables to /tmp/.chromium.
 # These directories and environment variables are needed for Chromium to work.

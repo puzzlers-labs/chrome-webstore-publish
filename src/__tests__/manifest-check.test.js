@@ -1,133 +1,58 @@
-// This test suite verifies that the main process correctly checks for the presence of manifest.json in the extension ZIP file and handles various error scenarios.
-// It mocks file system and unzipper operations to simulate different conditions, and ensures process exits or continues as expected based on input validity.
+/**
+ * This file contains tests for the checkManifestInZip function.
+ * It verifies that manifest.json is correctly detected in a ZIP file and ensures all error and edge cases are handled.
+ * The tests cover presence, absence, invalid input, and extraction errors for manifest.json.
+ */
 
 import fs from 'fs';
 import path from 'path';
-import unzipper from 'unzipper';
+import checkManifestInZip from '#src/manifest-check.js';
 
 jest.mock('fs');
 jest.mock('unzipper');
 
-// Save the original environment and declare a spy for process.exit
-const originalEnv = process.env;
-let exitSpy;
+/**
+ * Test suite for checkManifestInZip
+ * Sets up mocks for file system and unzipper, then tests manifest detection and error handling
+ */
+describe('checkManifestInZip', () => {
+  const zipFilePath = '/tmp/test.zip';
+  const tmpDir = '/tmp/manifest-check-123';
+  const manifestPath = path.join(tmpDir, 'manifest.json');
 
-// Reset mocks and environment before each test to ensure isolation
-beforeEach(() => {
-  jest.clearAllMocks();
-  process.env = { ...originalEnv };
-  exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {});
-});
-// Restore process.exit after each test
-afterEach(() => {
-  exitSpy.mockRestore();
-});
-// Restore the original environment after all tests
-afterAll(() => {
-  process.env = originalEnv;
-});
-
-// Group tests related to manifest.json presence and error handling
-describe('manifest.json presence check', () => {
-  // Test: Should exit with error if manifest.json is missing from the ZIP
-  it('throws error if manifest.json is missing from the ZIP', async () => {
-    fs.mkdtempSync.mockReturnValue('/tmp/manifest-check-123');
+  // Sets up default mock return values before each test
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fs.mkdtempSync.mockReturnValue(tmpDir);
     fs.createReadStream.mockReturnValue({ pipe: () => ({ promise: () => Promise.resolve() }) });
-    fs.existsSync.mockImplementation(
-      (filePath) => filePath !== path.join('/tmp/manifest-check-123', 'manifest.json')
+  });
+
+  // Resolves if manifest.json is present in the extracted directory
+  it('resolves if manifest.json is present', async () => {
+    fs.existsSync.mockImplementation((filePath) => filePath === manifestPath);
+    await expect(checkManifestInZip(zipFilePath)).resolves.toBeUndefined();
+  });
+
+  // Throws if manifest.json is missing
+  it('throws if manifest.json is missing', async () => {
+    fs.existsSync.mockReturnValue(false);
+    await expect(checkManifestInZip(zipFilePath)).rejects.toThrow(
+      'manifest.json not found at the root'
     );
-
-    process.env.INPUT_EXTENSION_ID = 'id';
-    process.env.INPUT_ZIP_FILE_PATH = 'file.zip';
-    process.env.INPUT_CLIENT_ID = 'cid';
-    process.env.INPUT_CLIENT_SECRET = 'csecret';
-    process.env.INPUT_REFRESH_TOKEN = 'rtoken';
-
-    // Import main file and expect process.exit(1) due to missing manifest.json
-    await jest.isolateModulesAsync(async () => {
-      await import('../index.js');
-      await Promise.resolve();
-      expect(process.exit).toHaveBeenCalledWith(1);
-    });
   });
 
-  // Test: Should not exit if manifest.json is present in the ZIP
-  it('does not throw if manifest.json is present in the ZIP', async () => {
-    fs.mkdtempSync.mockReturnValue('/tmp/manifest-check-456');
-    fs.createReadStream.mockReturnValue({ pipe: () => ({ promise: () => Promise.resolve() }) });
-    fs.existsSync.mockImplementation(
-      (filePath) => filePath === path.join('/tmp/manifest-check-456', 'manifest.json')
-    );
-
-    process.env.INPUT_EXTENSION_ID = 'id';
-    process.env.INPUT_ZIP_FILE_PATH = 'file.zip';
-    process.env.INPUT_CLIENT_ID = 'cid';
-    process.env.INPUT_CLIENT_SECRET = 'csecret';
-    process.env.INPUT_REFRESH_TOKEN = 'rtoken';
-
-    // Import main file and expect process.exit not to be called
-    jest.isolateModules(async () => {
-      await import('../index.js');
-      expect(process.exit).not.toHaveBeenCalled();
-    });
+  // Throws for missing or invalid zipFilePath arguments
+  it('throws if zipFilePath is missing or invalid', async () => {
+    await expect(checkManifestInZip()).rejects.toThrow('zipFilePath must be a non-empty string');
+    await expect(checkManifestInZip('')).rejects.toThrow('zipFilePath must be a non-empty string');
+    await expect(checkManifestInZip(123)).rejects.toThrow('zipFilePath must be a non-empty string');
   });
 
-  // Test: Should exit with error if required environment variables are missing
-  it('throws error if required environment variables are missing', async () => {
-    fs.mkdtempSync.mockReturnValue('/tmp/manifest-check-missing-env');
-    fs.createReadStream.mockReturnValue({ pipe: () => ({ promise: () => Promise.resolve() }) });
-    fs.existsSync.mockReturnValue(true);
-    process.env.INPUT_EXTENSION_ID = '';
-    process.env.INPUT_ZIP_FILE_PATH = '';
-    process.env.INPUT_CLIENT_ID = '';
-    process.env.INPUT_CLIENT_SECRET = '';
-    process.env.INPUT_REFRESH_TOKEN = '';
-    // Import main file and expect process.exit(1) due to missing env vars
-    await jest.isolateModulesAsync(async () => {
-      await import('../index.js');
-      await Promise.resolve();
-      expect(process.exit).toHaveBeenCalledWith(1);
+  // Throws if extraction fails
+  it('throws if extraction fails', async () => {
+    fs.createReadStream.mockReturnValue({
+      pipe: () => ({ promise: () => Promise.reject(new Error('extract fail')) }),
     });
-  });
-
-  // Test: Should exit with error if both crx_private_key and crx_private_key_path are set
-  it('throws error if both crx_private_key and crx_private_key_path are set', async () => {
-    fs.mkdtempSync.mockReturnValue('/tmp/manifest-check-both-keys');
-    fs.createReadStream.mockReturnValue({ pipe: () => ({ promise: () => Promise.resolve() }) });
-    fs.existsSync.mockReturnValue(true);
-    process.env.INPUT_EXTENSION_ID = 'id';
-    process.env.INPUT_ZIP_FILE_PATH = 'file.zip';
-    process.env.INPUT_CLIENT_ID = 'cid';
-    process.env.INPUT_CLIENT_SECRET = 'csecret';
-    process.env.INPUT_REFRESH_TOKEN = 'rtoken';
-    process.env.INPUT_CRX_PRIVATE_KEY = 'key';
-    process.env.INPUT_CRX_PRIVATE_KEY_PATH = 'keypath';
-    // Import main file and expect process.exit(1) due to both keys being set
-    await jest.isolateModulesAsync(async () => {
-      await import('../index.js');
-      await Promise.resolve();
-      expect(process.exit).toHaveBeenCalledWith(1);
-    });
-  });
-
-  // Test: Should log error and exit if an unexpected error occurs in the main logic
-  it('logs error and exits process on unexpected error', async () => {
-    fs.mkdtempSync.mockImplementation(() => {
-      throw new Error('unexpected');
-    });
-    process.env.INPUT_EXTENSION_ID = 'id';
-    process.env.INPUT_ZIP_FILE_PATH = 'file.zip';
-    process.env.INPUT_CLIENT_ID = 'cid';
-    process.env.INPUT_CLIENT_SECRET = 'csecret';
-    process.env.INPUT_REFRESH_TOKEN = 'rtoken';
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    // Import main file and expect process.exit(1) and error log
-    await jest.isolateModulesAsync(async () => {
-      await import('../index.js');
-      await Promise.resolve();
-      expect(process.exit).toHaveBeenCalledWith(1);
-      expect(console.error).toHaveBeenCalled();
-    });
-    console.error.mockRestore();
+    await expect(checkManifestInZip(zipFilePath)).rejects.toThrow('extract fail');
   });
 });

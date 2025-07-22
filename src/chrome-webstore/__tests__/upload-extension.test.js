@@ -1,5 +1,8 @@
-// This file contains Jest tests for the uploadExtension function, which handles uploading a Chrome extension package to the Chrome Web Store.
-// The tests cover successful uploads, error handling for failed uploads, and request failures.
+/**
+ * This file contains tests for the uploadExtension utility.
+ * It verifies correct uploading of extension packages and error handling for all edge cases.
+ * The tests cover successful upload, upload failures, request errors, and input validation.
+ */
 
 import fs from 'fs';
 import axios from 'axios';
@@ -8,84 +11,90 @@ import uploadExtension from '#src/chrome-webstore/upload-extension.js';
 jest.mock('axios');
 jest.mock('fs');
 
+/**
+ * Test suite for uploadExtension
+ * Sets up mocks for axios and file system, then tests upload and error handling
+ */
 describe('uploadExtension', () => {
-  const params = {
-    extensionId: 'id',
-    packageFilePath: 'path/to/zip',
-    accessToken: 'token',
-  };
+  const extensionId = 'id';
+  const accessToken = 'token';
+  const packageFilePath = 'path/to/zip';
 
-  // Reset mocks and set up a dummy stream before each test.
+  // Clears all mocks and sets up default mock before each test
   beforeEach(() => {
     jest.clearAllMocks();
     fs.createReadStream.mockReturnValue({});
   });
 
-  // Should resolve with response data when upload is successful.
+  // Uploads extension successfully
   it('uploads extension successfully', async () => {
     axios.put.mockResolvedValue({ data: { uploadState: 'SUCCESS', foo: 'bar' } });
-    const result = await uploadExtension(params);
+    const result = await uploadExtension(extensionId, accessToken, packageFilePath);
     expect(result).toEqual({ uploadState: 'SUCCESS', foo: 'bar' });
-    expect(fs.createReadStream).toHaveBeenCalledWith('path/to/zip');
+    expect(fs.createReadStream).toHaveBeenCalledWith(packageFilePath);
     expect(axios.put).toHaveBeenCalled();
   });
 
-  // Should throw if uploadState is not SUCCESS in the response.
+  // Throws error if uploadState is not SUCCESS
   it('throws error if uploadState is not SUCCESS', async () => {
     axios.put.mockResolvedValue({ data: { uploadState: 'FAIL' } });
-    await expect(uploadExtension(params)).rejects.toThrow('Upload failed');
+    await expect(uploadExtension(extensionId, accessToken, packageFilePath)).rejects.toThrow(
+      'Upload failed'
+    );
   });
 
-  // Should throw with error message if axios request fails.
-  it('throws error on request failure', async () => {
+  // Throws error on request failure with error
+  it('throws error on request failure with error', async () => {
     axios.put.mockRejectedValue({ response: { data: { error: 'fail' } } });
-    await expect(uploadExtension(params)).rejects.toThrow('fail');
+    await expect(uploadExtension(extensionId, accessToken, packageFilePath)).rejects.toThrow(
+      'fail'
+    );
   });
 
-  // Should throw with error message if axios request fails with no response property.
-  it('throws error on request failure with no response', async () => {
+  // Throws error on request failure with message
+  it('throws error on request failure with message', async () => {
     axios.put.mockRejectedValue(new Error('network down'));
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: 'token' })
-    ).rejects.toThrow('network down');
+    await expect(uploadExtension(extensionId, accessToken, packageFilePath)).rejects.toThrow(
+      'network down'
+    );
   });
 
-  // Tests that an error is thrown if extensionId is missing or invalid
+  // Throws error if extensionId is missing or invalid
   it('throws error if extensionId is missing or invalid', async () => {
-    await expect(
-      uploadExtension({ packageFilePath: 'path/to/zip', accessToken: 'token' })
-    ).rejects.toThrow('extensionId is required');
-    await expect(
-      uploadExtension({ extensionId: '', packageFilePath: 'path/to/zip', accessToken: 'token' })
-    ).rejects.toThrow('extensionId is required');
-    await expect(
-      uploadExtension({ extensionId: 123, packageFilePath: 'path/to/zip', accessToken: 'token' })
-    ).rejects.toThrow('extensionId is required');
+    await expect(uploadExtension(undefined, accessToken, packageFilePath)).rejects.toThrow(
+      'extensionId is required'
+    );
+    await expect(uploadExtension('', accessToken, packageFilePath)).rejects.toThrow(
+      'extensionId is required'
+    );
+    await expect(uploadExtension(123, accessToken, packageFilePath)).rejects.toThrow(
+      'extensionId is required'
+    );
   });
 
-  // Tests that an error is thrown if packageFilePath is missing or invalid
+  // Throws error if packageFilePath is missing or invalid
   it('throws error if packageFilePath is missing or invalid', async () => {
-    await expect(uploadExtension({ extensionId: 'id', accessToken: 'token' })).rejects.toThrow(
+    await expect(uploadExtension(extensionId, accessToken, undefined)).rejects.toThrow(
       'packageFilePath is required'
     );
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: '', accessToken: 'token' })
-    ).rejects.toThrow('packageFilePath is required');
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: 123, accessToken: 'token' })
-    ).rejects.toThrow('packageFilePath is required');
+    await expect(uploadExtension(extensionId, accessToken, '')).rejects.toThrow(
+      'packageFilePath is required'
+    );
+    await expect(uploadExtension(extensionId, accessToken, 123)).rejects.toThrow(
+      'packageFilePath is required'
+    );
   });
 
-  // Tests that an error is thrown if accessToken is missing or invalid
+  // Throws error if accessToken is missing or invalid
   it('throws error if accessToken is missing or invalid', async () => {
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip' })
-    ).rejects.toThrow('accessToken is required');
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: '' })
-    ).rejects.toThrow('accessToken is required');
-    await expect(
-      uploadExtension({ extensionId: 'id', packageFilePath: 'path/to/zip', accessToken: 123 })
-    ).rejects.toThrow('accessToken is required');
+    await expect(uploadExtension(extensionId, undefined, packageFilePath)).rejects.toThrow(
+      'accessToken is required'
+    );
+    await expect(uploadExtension(extensionId, '', packageFilePath)).rejects.toThrow(
+      'accessToken is required'
+    );
+    await expect(uploadExtension(extensionId, 123, packageFilePath)).rejects.toThrow(
+      'accessToken is required'
+    );
   });
 });

@@ -116,6 +116,7 @@ chrome-webstore-publish/
   - Console statements are allowed.
   - No unresolved import errors for `#src` alias.
 - **EditorConfig:** 2 spaces per indent, LF line endings, auto-format on save.
+- **Throwing Errors:** Always throw errors with a descriptive message and prepend a console.error statement.
 
 ---
 
