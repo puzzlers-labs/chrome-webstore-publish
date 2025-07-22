@@ -8,13 +8,12 @@ import qs from 'qs';
 /**
  * Retrieves a new access token from Google OAuth2 using the provided refresh token and credentials.
  * Throws an error if the token cannot be obtained or if the response is invalid.
- * @param {Object} params - The parameters required to get the access token.
- * @param {string} params.clientId - The OAuth2 client ID from Google Cloud Console.
- * @param {string} params.clientSecret - The OAuth2 client secret from Google Cloud Console.
- * @param {string} params.refreshToken - The refresh token previously obtained for the user or service account.
+ * @param {string} clientId - The OAuth2 client ID from Google Cloud Console.
+ * @param {string} clientSecret - The OAuth2 client secret from Google Cloud Console.
+ * @param {string} refreshToken - The refresh token previously obtained for the user or service account.
  * @returns {Promise<string>} Resolves to the new access token string if successful, otherwise throws an error.
  */
-async function getAccessToken({ clientId, clientSecret, refreshToken }) {
+async function getAccessToken(clientId, clientSecret, refreshToken) {
   // Validate required arguments
   if (!clientId || typeof clientId !== 'string') {
     throw new Error('clientId is required and must be a non-empty string');
