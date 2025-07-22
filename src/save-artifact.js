@@ -1,6 +1,8 @@
-// This file provides a utility function to save a file as an artifact for GitHub Actions.
-// It copies the file to a designated directory, sets permissions, and writes the output path if needed.
-// Intended for use with signed packages or build artifacts.
+/**
+ * This file provides a utility function to save a file as an artifact for GitHub Actions.
+ * It copies the file to a designated directory, sets permissions, and writes the output path if needed.
+ * Intended for use with signed packages or build artifacts.
+ */
 
 import fs from 'fs';
 import path from 'path';
@@ -13,6 +15,12 @@ import path from 'path';
  * @returns {string} - The destination path of the saved artifact.
  */
 export default function saveArtifact(sourceFilePath, outputEnv) {
+  // Validate required arguments
+  if (!sourceFilePath || typeof sourceFilePath !== 'string' || !sourceFilePath.trim()) {
+    console.error('sourceFilePath is required and must be a non-empty string');
+    throw new Error('sourceFilePath is required and must be a non-empty string');
+  }
+
   const actionDirectory = 'chrome-webstore-publish-artifacts';
   const artifactDir = path.resolve(actionDirectory);
 
