@@ -15,7 +15,7 @@ import axios from 'axios';
  * @param {string} accessToken - OAuth2 access token for authentication.
  * @param {string} packageFilePath - Path to the ZIP or CRX file to upload.
  */
-async function uploadExtensionPackage(extensionId, accessToken, packageFilePath) {
+async function uploadExtension(extensionId, accessToken, packageFilePath) {
   // Validate required parameters
   if (!extensionId || typeof extensionId !== 'string' || !extensionId.trim()) {
     console.error('extensionId is required and must be a non-empty string');
@@ -67,4 +67,4 @@ async function uploadExtensionPackage(extensionId, accessToken, packageFilePath)
   }
 }
 
-export default uploadExtensionPackage;
+export default uploadExtension;
