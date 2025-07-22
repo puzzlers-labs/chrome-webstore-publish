@@ -8,9 +8,17 @@ node_modules
 .git
 .github
 .vscode
-Dockerfile
-README.md
+.gitignore
+.node-version
+.npmrc
+.prettierignore
+.prettierrc
+CODE_OF_CONDUCT.md
 CONTRIBUTING.md
+Dockerfile
+# LICENSE - Let the license be in the image.
+README.md
+
 action.yml
 
 # Ignore test files and directories
