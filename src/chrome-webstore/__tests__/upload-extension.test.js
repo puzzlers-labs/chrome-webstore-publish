@@ -4,6 +4,7 @@
  * The tests cover successful upload, upload failures, request errors, and input validation.
  */
 
+import { Buffer } from 'buffer';
 import fs from 'fs';
 import axios from 'axios';
 import uploadExtension from '#src/chrome-webstore/upload-extension.js';
@@ -23,7 +24,7 @@ describe('uploadExtension', () => {
   // Clears all mocks and sets up default mock before each test
   beforeEach(() => {
     jest.clearAllMocks();
-    fs.createReadStream.mockReturnValue({});
+    fs.readFileSync.mockReturnValue(Buffer.from('test data'));
   });
 
   // Uploads extension successfully
@@ -31,7 +32,7 @@ describe('uploadExtension', () => {
     axios.put.mockResolvedValue({ data: { uploadState: 'SUCCESS', foo: 'bar' } });
     const result = await uploadExtension(extensionId, accessToken, packageFilePath);
     expect(result).toEqual({ uploadState: 'SUCCESS', foo: 'bar' });
-    expect(fs.createReadStream).toHaveBeenCalledWith(packageFilePath);
+    expect(fs.readFileSync).toHaveBeenCalledWith(packageFilePath);
     expect(axios.put).toHaveBeenCalled();
   });
 
