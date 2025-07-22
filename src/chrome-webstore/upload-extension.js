@@ -34,7 +34,7 @@ async function uploadExtensionPackage(extensionId, accessToken, packageFilePath)
 
   // Prepare the upload URL and file stream for the upload request.
   const url = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}?uploadType=media`;
-  const fileStream = fs.createReadStream(packageFilePath);
+  const fileBuffer = fs.readFileSync(packageFilePath);
   const isCrx = packageFilePath.endsWith('.crx');
   const contentType = isCrx ? 'application/x-chrome-extension' : 'application/zip';
   const fileName = path.basename(packageFilePath);
@@ -43,7 +43,7 @@ async function uploadExtensionPackage(extensionId, accessToken, packageFilePath)
 
   try {
     console.log('Uploading extension package to Chrome Web Store...');
-    const res = await axios.put(url, fileStream, {
+    const res = await axios.put(url, fileBuffer, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'x-goog-api-version': '2',
