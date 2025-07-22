@@ -5,9 +5,7 @@
  */
 
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
-import unzipper from 'unzipper';
 import checkManifestInZip from '#src/manifest-check.js';
 
 jest.mock('fs');
