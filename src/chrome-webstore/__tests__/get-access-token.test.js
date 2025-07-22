@@ -1,75 +1,70 @@
-// This file contains Jest tests for the getAccessToken function, which retrieves a Google OAuth2 access token using a refresh token.
-// The tests cover successful token retrieval, missing token in response, and error handling for failed requests.
+/**
+ * This file contains tests for the getAccessToken utility.
+ * It verifies correct retrieval of access tokens and error handling for all edge cases.
+ * The tests cover successful retrieval, missing fields, request failures, and input validation.
+ */
 
 import axios from 'axios';
-import { getAccessToken } from '#src/chrome-webstore/index.js';
+import getAccessToken from '#src/chrome-webstore/get-access-token.js';
 
 jest.mock('axios');
 
+/**
+ * Test suite for getAccessToken
+ * Sets up mocks for axios, then tests token retrieval and error handling
+ */
 describe('getAccessToken', () => {
-  // Tests that a valid access token is returned when the request succeeds
+  // Returns access token on success
   it('returns access token on success', async () => {
     axios.post.mockResolvedValue({ data: { access_token: 'mock_token' } });
-    const token = await getAccessToken({
-      clientId: 'id',
-      clientSecret: 'secret',
-      refreshToken: 'refresh',
-    });
+    const token = await getAccessToken('id', 'secret', 'refresh');
     expect(token).toBe('mock_token');
   });
 
-  // Tests that an error is thrown if the response does not contain an access_token
+  // Throws error if no access_token in response
   it('throws error if no access_token in response', async () => {
     axios.post.mockResolvedValue({ data: {} });
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })
-    ).rejects.toThrow('No access_token in response');
+    await expect(getAccessToken('id', 'secret', 'refresh')).rejects.toThrow(
+      'No access_token in response'
+    );
   });
 
-  // Tests that an error is thrown if the request to Google OAuth2 fails
-  it('throws error on request failure', async () => {
+  // Throws error on request failure with error_description
+  it('throws error on request failure with error_description', async () => {
     axios.post.mockRejectedValue({ response: { data: { error_description: 'fail' } } });
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: 'refresh' })
-    ).rejects.toThrow('fail');
+    await expect(getAccessToken('id', 'secret', 'refresh')).rejects.toThrow('fail');
   });
 
-  // Tests that an error is thrown if clientId is missing or invalid
+  // Throws error on request failure with message
+  it('throws error on request failure with message', async () => {
+    axios.post.mockRejectedValue(new Error('network down'));
+    await expect(getAccessToken('id', 'secret', 'refresh')).rejects.toThrow('network down');
+  });
+
+  // Throws error if clientId is missing or invalid
   it('throws error if clientId is missing or invalid', async () => {
-    await expect(
-      getAccessToken({ clientSecret: 'secret', refreshToken: 'refresh' })
-    ).rejects.toThrow('clientId is required');
-    await expect(
-      getAccessToken({ clientId: '', clientSecret: 'secret', refreshToken: 'refresh' })
-    ).rejects.toThrow('clientId is required');
-    await expect(
-      getAccessToken({ clientId: 123, clientSecret: 'secret', refreshToken: 'refresh' })
-    ).rejects.toThrow('clientId is required');
+    await expect(getAccessToken(undefined, 'secret', 'refresh')).rejects.toThrow(
+      'clientId is required'
+    );
+    await expect(getAccessToken('', 'secret', 'refresh')).rejects.toThrow('clientId is required');
+    await expect(getAccessToken(123, 'secret', 'refresh')).rejects.toThrow('clientId is required');
   });
 
-  // Tests that an error is thrown if clientSecret is missing or invalid
+  // Throws error if clientSecret is missing or invalid
   it('throws error if clientSecret is missing or invalid', async () => {
-    await expect(getAccessToken({ clientId: 'id', refreshToken: 'refresh' })).rejects.toThrow(
+    await expect(getAccessToken('id', undefined, 'refresh')).rejects.toThrow(
       'clientSecret is required'
     );
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: '', refreshToken: 'refresh' })
-    ).rejects.toThrow('clientSecret is required');
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: 123, refreshToken: 'refresh' })
-    ).rejects.toThrow('clientSecret is required');
+    await expect(getAccessToken('id', '', 'refresh')).rejects.toThrow('clientSecret is required');
+    await expect(getAccessToken('id', 123, 'refresh')).rejects.toThrow('clientSecret is required');
   });
 
-  // Tests that an error is thrown if refreshToken is missing or invalid
+  // Throws error if refreshToken is missing or invalid
   it('throws error if refreshToken is missing or invalid', async () => {
-    await expect(getAccessToken({ clientId: 'id', clientSecret: 'secret' })).rejects.toThrow(
+    await expect(getAccessToken('id', 'secret', undefined)).rejects.toThrow(
       'refreshToken is required'
     );
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: '' })
-    ).rejects.toThrow('refreshToken is required');
-    await expect(
-      getAccessToken({ clientId: 'id', clientSecret: 'secret', refreshToken: 123 })
-    ).rejects.toThrow('refreshToken is required');
+    await expect(getAccessToken('id', 'secret', '')).rejects.toThrow('refreshToken is required');
+    await expect(getAccessToken('id', 'secret', 123)).rejects.toThrow('refreshToken is required');
   });
 });

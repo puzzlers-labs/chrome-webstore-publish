@@ -1,37 +1,42 @@
-// This file contains Jest tests for the publishExtension function, which publishes a Chrome extension to the Web Store.
-// The tests cover expedited review, fallback to regular review, publish failures, and request errors.
+/**
+ * This file contains tests for the publishExtension utility.
+ * It verifies correct publishing of extensions and error handling for all edge cases.
+ * The tests cover expedited and regular review, publish failures, request errors, and input validation.
+ */
 
 import axios from 'axios';
-import { publishExtension } from '#src/chrome-webstore/index.js';
+import publishExtension from '#src/chrome-webstore/publish-extension.js';
 
 jest.mock('axios');
 
+/**
+ * Test suite for publishExtension
+ * Sets up mocks for axios, then tests publishing and error handling
+ */
 describe('publishExtension', () => {
-  const params = {
-    extensionId: 'id',
-    accessToken: 'token',
-    publishTarget: undefined,
-    expeditedReview: false,
-  };
+  const extensionId = 'id';
+  const accessToken = 'token';
+  const publishTarget = 'default';
 
+  // Clears all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  // Tests publishing with expedited review enabled
+  // Publishes with expedited review
   it('publishes with expedited review', async () => {
     axios.post.mockResolvedValueOnce({ data: { status: ['OK'] } });
-    const result = await publishExtension({ ...params, expeditedReview: true });
+    const result = await publishExtension(extensionId, accessToken, publishTarget, true);
     expect(result).toEqual({ status: ['OK'] });
   });
 
-  // Tests fallback to regular review if expedited review fails
+  // Falls back to regular review if expedited fails
   it('falls back to regular review if expedited fails', async () => {
     axios.post
       .mockRejectedValueOnce({ response: { data: { error: 'expedite fail' } } })
       .mockResolvedValueOnce({ data: { status: ['OK'] } });
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    const result = await publishExtension({ ...params, expeditedReview: true });
+    const result = await publishExtension(extensionId, accessToken, publishTarget, true);
     expect(warnSpy).toHaveBeenCalledWith(
       'Expedited review publish failed, falling back to regular review.',
       'expedite fail'
@@ -40,58 +45,60 @@ describe('publishExtension', () => {
     warnSpy.mockRestore();
   });
 
-  // Tests that an error is thrown if the publish API returns a failure status
+  // Throws error if publish fails
   it('throws error if publish fails', async () => {
     axios.post.mockResolvedValueOnce({ data: { status: ['FAIL'] } });
-    await expect(publishExtension(params)).rejects.toThrow('Publish failed');
+    await expect(publishExtension(extensionId, accessToken, publishTarget)).rejects.toThrow(
+      'Publish failed'
+    );
   });
 
-  // Tests that an error is thrown if the publish request itself fails
-  it('throws error if request fails', async () => {
+  // Throws error if request fails with error
+  it('throws error if request fails with error', async () => {
     axios.post.mockRejectedValueOnce({ response: { data: { error: 'fail' } } });
-    await expect(publishExtension(params)).rejects.toThrow('fail');
+    await expect(publishExtension(extensionId, accessToken, publishTarget)).rejects.toThrow('fail');
   });
 
-  // Tests that an error is thrown if extensionId is missing or invalid
+  // Throws error if extensionId is missing or invalid
   it('throws error if extensionId is missing or invalid', async () => {
-    await expect(publishExtension({ accessToken: 'token' })).rejects.toThrow(
+    await expect(publishExtension(undefined, accessToken, publishTarget)).rejects.toThrow(
       'extensionId (string) is required'
     );
-    await expect(publishExtension({ extensionId: '', accessToken: 'token' })).rejects.toThrow(
+    await expect(publishExtension('', accessToken, publishTarget)).rejects.toThrow(
       'extensionId (string) is required'
     );
-    await expect(publishExtension({ extensionId: 123, accessToken: 'token' })).rejects.toThrow(
+    await expect(publishExtension(123, accessToken, publishTarget)).rejects.toThrow(
       'extensionId (string) is required'
     );
   });
 
-  // Tests that an error is thrown if accessToken is missing or invalid
+  // Throws error if accessToken is missing or invalid
   it('throws error if accessToken is missing or invalid', async () => {
-    await expect(publishExtension({ extensionId: 'id' })).rejects.toThrow(
+    await expect(publishExtension(extensionId, undefined, publishTarget)).rejects.toThrow(
       'accessToken (string) is required'
     );
-    await expect(publishExtension({ extensionId: 'id', accessToken: '' })).rejects.toThrow(
+    await expect(publishExtension(extensionId, '', publishTarget)).rejects.toThrow(
       'accessToken (string) is required'
     );
-    await expect(publishExtension({ extensionId: 'id', accessToken: 123 })).rejects.toThrow(
+    await expect(publishExtension(extensionId, 123, publishTarget)).rejects.toThrow(
       'accessToken (string) is required'
     );
   });
 
-  // Tests that an error is thrown if publishTarget is invalid
+  // Throws error if publishTarget is invalid
   it('throws error if publishTarget is invalid', async () => {
-    await expect(
-      publishExtension({ extensionId: 'id', accessToken: 'token', publishTarget: 'invalid' })
-    ).rejects.toThrow('publishTarget must be `trustedTesters` or `default`');
+    await expect(publishExtension(extensionId, accessToken, 'invalid')).rejects.toThrow(
+      'publishTarget must be `trustedTesters` or `default`'
+    );
   });
 
-  // Tests that an error is thrown if the regular publish request itself fails (fallback path)
+  // Throws error if regular publish request fails after expedited fails
   it('throws error if regular publish request fails after expedited fails', async () => {
     axios.post
       .mockRejectedValueOnce({ response: { data: { error: 'expedite fail' } } }) // expedited fails
       .mockRejectedValueOnce({ response: { data: { error: 'regular fail' } } }); // regular fails
-    await expect(
-      publishExtension({ extensionId: 'id', accessToken: 'token', expeditedReview: true })
-    ).rejects.toThrow('regular fail');
+    await expect(publishExtension(extensionId, accessToken, publishTarget, true)).rejects.toThrow(
+      'regular fail'
+    );
   });
 });
