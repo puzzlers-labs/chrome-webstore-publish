@@ -74,7 +74,6 @@ async function run() {
 
       // Pack CRX and set the package file path to the CRX file.
       packageFilePath = await packCrxWithChrome(tmpDir, privateKeyPath);
-      console.log('[DEBUG] CRX package created:', packageFilePath);
     }
 
     // Save the signed package as an artifact if requested using a utility function.
@@ -93,8 +92,6 @@ async function run() {
       console.log('Access token obtained.');
 
       // Uploads the extension package (ZIP or CRX) to the Chrome Web Store.
-      console.log('[DEBUG] About to upload file:', packageFilePath);
-      console.log('[DEBUG] File extension for upload:', path.extname(packageFilePath));
       console.log('Uploading extension...');
       await uploadExtension(extensionId, accessToken, packageFilePath);
       console.log('Extension uploaded.');

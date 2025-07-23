@@ -30,8 +30,7 @@ describe('packCrxWithChrome integration', () => {
     // Use /tmp for temp directory for better compatibility
     const tmpBase = '/tmp';
     tempDir = fs.mkdtempSync(path.join(tmpBase, 'crx-test-'));
-    console.log('os.tmpdir():', os.tmpdir());
-    console.log('tempDir:', tempDir);
+
     // Write a barebones manifest.json
     const manifestPath = path.join(tempDir, 'manifest.json');
     fs.writeFileSync(
@@ -42,7 +41,7 @@ describe('packCrxWithChrome integration', () => {
         version: '1.0',
       })
     );
-    console.log('manifestPath:', manifestPath);
+
     // Generate a key pair OUTSIDE the extension directory
     keyPath = path.join(tmpBase, `test-key-${Date.now()}.pem`);
     const { privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -52,8 +51,6 @@ describe('packCrxWithChrome integration', () => {
     });
     fs.writeFileSync(keyPath, privateKey);
     crxPath = `${tempDir}.crx`;
-    console.log('keyPath:', keyPath);
-    console.log('crxPath:', crxPath);
   });
 
   // Cleans up the temporary extension directory and key after all tests
@@ -68,14 +65,10 @@ describe('packCrxWithChrome integration', () => {
 
   // Tests that packCrxWithChrome successfully creates a CRX file from the extension directory
   it('packs a real extension directory into a CRX', async () => {
-    // Ensure the directory and manifest exist
-    console.log('Checking tempDir exists:', fs.existsSync(tempDir));
-    console.log('Checking manifest exists:', fs.existsSync(path.join(tempDir, 'manifest.json')));
     // Fail the test if Chromium is not available
     let chromiumFound = true;
     let versionError = null;
     try {
-      console.log('Running version check:', chromePath, '--version');
       execFileSync(chromePath, ['--version'], { stdio: 'inherit' });
     } catch (err) {
       chromiumFound = false;
@@ -85,9 +78,7 @@ describe('packCrxWithChrome integration', () => {
       console.error('Chrome version check failed:', versionError);
       throw new Error(`Chromium is required at ${chromePath} for this test to run.`);
     }
-    console.log('Running packCrxWithChrome with:', tempDir, keyPath, chromePath);
     const result = await packCrxWithChrome(tempDir, keyPath, chromePath);
-    console.log('packCrxWithChrome result:', result);
     expect(result).toBe(crxPath);
     expect(fs.existsSync(crxPath)).toBe(true);
   });

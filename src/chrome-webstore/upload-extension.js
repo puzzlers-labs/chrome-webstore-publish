@@ -30,16 +30,12 @@ async function uploadExtension(extensionId, accessToken, packageFilePath) {
     throw new Error('accessToken is required and must be a non-empty string');
   }
 
-  console.log('[DEBUG] Package file path:', packageFilePath);
-
   // Prepare the upload URL and file stream for the upload request.
   const url = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}?uploadType=media`;
   const fileBuffer = fs.readFileSync(packageFilePath);
   const isCrx = packageFilePath.endsWith('.crx');
   const contentType = isCrx ? 'application/x-chrome-extension' : 'application/zip';
   const fileName = path.basename(packageFilePath);
-
-  console.log('[DEBUG] Content-Type:', contentType);
 
   try {
     console.log('Uploading extension package to Chrome Web Store...');
