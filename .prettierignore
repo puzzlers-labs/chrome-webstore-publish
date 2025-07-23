@@ -3,3 +3,6 @@
 
 # Ignore the LICENSE file from formatting.
 LICENSE
+
+# Ignore the pnpm-lock.yaml file from formatting.
+pnpm-lock.yaml
