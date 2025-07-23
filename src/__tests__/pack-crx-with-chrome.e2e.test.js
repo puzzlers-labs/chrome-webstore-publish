@@ -7,7 +7,6 @@
 import { execFileSync } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import puppeteer from 'puppeteer';
 import packCrxWithChrome from '#src/pack-crx-with-chrome.js';
