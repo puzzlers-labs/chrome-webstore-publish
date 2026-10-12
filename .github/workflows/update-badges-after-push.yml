@@ -59,7 +59,7 @@ jobs:
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: badges
           path: .github
@@ -131,7 +131,7 @@ jobs:
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: badges
           path: .github
@@ -173,7 +173,7 @@ jobs:
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: badges
           path: .github
@@ -230,21 +230,21 @@ jobs:
 
       # Downloads the updated coverage badge artifact
       - name: Download coverage badge
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: coverage-badge
           path: .github
 
       # Downloads the updated Docker build badge artifact
       - name: Download Docker build badge
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docker-build-badge
           path: .github
 
       # Downloads the updated test badge artifact
       - name: Download test status badge
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: test-status-badge
           path: .github
