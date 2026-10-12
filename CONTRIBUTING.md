@@ -61,6 +61,7 @@ Thank you for your interest in contributing! This project is an open-source GitH
 
 - **Node.js:** v22.0.0 or higher (enforced via `package.json` and `.npmrc`)
 - **pnpm:** Used for dependency management (see `.npmrc`)
+- **zip:** Required by the multi-file ZIP extraction regression test.
 - **Docker:** Required if you want to test the action in a containerized environment, otherwise optional.
 - **Google Cloud Project:** For integration testing with the Chrome Web Store API (see [README](README.md) for API setup)
 
@@ -72,6 +73,8 @@ Thank you for your interest in contributing! This project is an open-source GitH
 chrome-webstore-publish/
 ├── src/
 │   ├── index.js                 # Main entry point for the GitHub Action logic
+│   ├── extract-zip.js           # Extracts complete ZIP archives using their central directory
+│   ├── manifest-check.js        # Verifies manifest.json is a file at the ZIP root
 │   ├── pack-crx-with-chrome.js  # Utility for packing CRX files using Chromium
 │   ├── chrome-webstore/
 │   │   ├── index.js             # Exports API helpers (getAccessToken, uploadExtension, publishExtension)
@@ -101,6 +104,7 @@ chrome-webstore-publish/
 - **Test Style:** Each test file uses descriptive `describe` and `it` blocks. Mocks are used for HTTP requests (e.g., `jest.mock('axios')`).
 - **Coverage:** Run `pnpm test` to generate a coverage report.
 - **Puppeteer:** Some tests require Chromium; install browsers with `pnpm dlx puppeteer browsers install`.
+- **ZIP extraction:** The extraction regression test invokes the system `zip` command and verifies every file in a multi-file archive is written.
 
 ---
 
