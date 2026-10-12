@@ -10,8 +10,8 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import unzipper from 'unzipper';
 import { getAccessToken, publishExtension, uploadExtension } from '#src/chrome-webstore/index.js';
+import extractZip from '#src/extract-zip.js';
 import checkManifestInZip from '#src/manifest-check.js';
 import packCrxWithChrome from '#src/pack-crx-with-chrome.js';
 import parseInputs from '#src/parse-inputs.js';
@@ -65,14 +65,8 @@ async function run() {
     }
 
     if (privateKeyPath) {
-      // Unpacks the ZIP file to a temporary directory and prepares a CRX package if a private key is provided.
-      const tmpDir = fs.mkdtempSync(`${os.tmpdir()}/unpacked-`);
-      await fs
-        .createReadStream(resolvedZipFilePath)
-        .pipe(unzipper.Extract({ path: tmpDir }))
-        .promise();
-
-      // Pack CRX and set the package file path to the CRX file.
+      // Unpack every zip entry, then pack that directory into a CRX.
+      const tmpDir = await extractZip(resolvedZipFilePath);
       packageFilePath = await packCrxWithChrome(tmpDir, privateKeyPath);
     }
 
