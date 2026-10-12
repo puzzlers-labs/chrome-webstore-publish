@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: '22'
 
-      # Installs the latest version of pnpm for package management.
+      # Installs the repository's pinned pnpm version for reproducible builds.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.12.4
 
       # Installs all project dependencies using pnpm.
       - name: Install dependencies
@@ -50,11 +50,11 @@ jobs:
         with:
           node-version: '22'
 
-      # Installs the latest version of pnpm for package management.
+      # Installs the repository's pinned pnpm version for reproducible builds.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.12.4
 
       # Installs all project dependencies using pnpm.
       - name: Install dependencies
