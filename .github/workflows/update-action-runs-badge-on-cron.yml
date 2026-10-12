@@ -61,7 +61,7 @@ jobs:
     steps:
       # Checks out the repository code for badge initialization
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Creates a badge JSON file with the download count or an error message.
       - name: Prepare badge JSON

@@ -22,7 +22,7 @@ jobs:
     steps:
       # Checks out the repository code for badge initialization
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Creates badge JSON files with failing status for initial state
       - name: Set all badges to failing
@@ -55,7 +55,7 @@ jobs:
     steps:
       # Checks out the repository code for coverage job
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
@@ -127,7 +127,7 @@ jobs:
     steps:
       # Checks out the repository for Docker build
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
@@ -169,7 +169,7 @@ jobs:
     steps:
       # Checks out the repository for running tests
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Downloads initial badge files for update
       - name: Download badge artifacts
@@ -226,7 +226,7 @@ jobs:
     steps:
       # Checks out the repository to push updated badges
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Downloads the updated coverage badge artifact
       - name: Download coverage badge

@@ -16,7 +16,7 @@ jobs:
     steps:
       # Checks out the repository so workflow can access and modify files.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Needed to push tag for release
 

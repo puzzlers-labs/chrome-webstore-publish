@@ -15,7 +15,7 @@ jobs:
     steps:
       # Checks out the repository so workflow can access and modify files.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Sets up the specified Node.js version for running scripts and pnpm.
       - name: Set up Node.js
@@ -42,7 +42,7 @@ jobs:
     steps:
       # Checks out the repository so workflow can access and modify files.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Sets up the specified Node.js version for running scripts and pnpm.
       - name: Set up Node.js
