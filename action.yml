@@ -15,7 +15,7 @@ author: 'Puzzlers Labs'
 inputs:
   # Mode of operation: sign or publish. Default is publish (for backward compatibility)
   mode:
-    description: 'Mode of operation: sign or publish. (Default: publish)'
+    description: 'Use sign to save the package without uploading it, or publish to upload and publish it. (Default: publish)'
     required: true
     default: 'publish'
 
@@ -27,7 +27,7 @@ inputs:
 
   # Path to the ZIP file of the extension to upload.
   zip_file_path:
-    description: 'Path to the extension ZIP file.'
+    description: 'Path to an extension ZIP with manifest.json at its root.'
     required: true
 
   # OAuth2 client ID for Google Cloud authentication
@@ -59,12 +59,12 @@ inputs:
 
   # Private key data for CRX signing (optional)
   crx_private_key:
-    description: 'CRX signing private key (PEM string). If provided, the extension will be signed and uploaded as CRX.'
+    description: 'CRX signing private key as a PEM string. If provided, the ZIP is signed as a CRX.'
     required: false
 
   # Path to the private key file for CRX signing (optional)
   crx_private_key_path:
-    description: 'Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as CRX.'
+    description: 'Path to a CRX signing private key PEM file. If provided, the ZIP is signed as a CRX.'
     required: false
 
 # Specifies Docker as the runtime environment
