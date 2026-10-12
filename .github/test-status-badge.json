@@ -1,6 +1,1 @@
-{
-  "schemaVersion": 1,
-  "label": "Tests",
-  "message": "passing",
-  "color": "green"
-}
+{ "schemaVersion": 1, "label": "Tests", "message": "failing", "color": "red" }
