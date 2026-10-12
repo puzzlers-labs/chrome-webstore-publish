@@ -9,7 +9,7 @@ GitHub Action to upload and publish Chrome extension ZIP or CRX files to the Chr
 ## Features
 
 - Uploads a new version of an existing Chrome extension.
-- Optionally signs and uploads as CRX if a private key is provided
+- Optionally signs the extension as a CRX if a private key is provided
 - Publishes the extension to the public or trusted testers
 - Handles OAuth2 token refresh automatically
 - Supports expedited review with fallback to regular review
@@ -19,26 +19,27 @@ GitHub Action to upload and publish Chrome extension ZIP or CRX files to the Chr
 ## Prerequisites
 
 - The extension must already exist in the Chrome Web Store (**first publish must be manual**).
+- The extension ZIP must contain `manifest.json` as a file at the archive root.
 - You must have a Google Cloud project with the Chrome Web Store API enabled.
 - OAuth2 credentials (client ID, client secret, refresh token) with `https://www.googleapis.com/auth/chromewebstore` scope.
 - Follow this documentation to generate the client credentials and refresh token - [https://developer.chrome.com/docs/webstore/using-api](https://developer.chrome.com/docs/webstore/using-api).
 
 ## Inputs
 
-| Name                   | Description                                                                                                      | Required                |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `mode`                 | Mode of operation: `sign` or `publish`                                                                           | No (default: `publish`) |
-| `extension_id`         | The Chrome Web Store extension ID                                                                                | Yes                     |
-| `zip_file_path`        | Path to the extension ZIP file                                                                                   | Yes                     |
-| `client_id`            | Google Cloud OAuth2 client ID                                                                                    | Yes                     |
-| `client_secret`        | Google Cloud OAuth2 client secret                                                                                | Yes                     |
-| `refresh_token`        | OAuth2 refresh token of the user that has access to webstore api scope.                                          | Yes                     |
-| `publish_target`       | Publish target: `public` or `testers`                                                                            | No (default: `public`)  |
-| `expedited_review`     | Request expedited review if eligible (true/false). Falls back to regular review if not eligible.                 | No (default: `false`)   |
-| `crx_private_key`      | CRX signing private key (PEM string). If provided, the extension will be signed and uploaded as a CRX.           | No                      |
-| `crx_private_key_path` | Path to the CRX signing private key (PEM file). If provided, the extension will be signed and uploaded as a CRX. | No                      |
+| Name                   | Description                                                                                      | Required                |
+| ---------------------- | ------------------------------------------------------------------------------------------------ | ----------------------- |
+| `mode`                 | `sign` saves the package without uploading it; `publish` uploads and publishes it                | No (default: `publish`) |
+| `extension_id`         | The Chrome Web Store extension ID                                                                | Yes                     |
+| `zip_file_path`        | Path to an extension ZIP with `manifest.json` at its root                                        | Yes                     |
+| `client_id`            | Google Cloud OAuth2 client ID                                                                    | Yes                     |
+| `client_secret`        | Google Cloud OAuth2 client secret                                                                | Yes                     |
+| `refresh_token`        | OAuth2 refresh token of the user that has access to webstore api scope.                          | Yes                     |
+| `publish_target`       | Publish target: `public` or `testers`                                                            | No (default: `public`)  |
+| `expedited_review`     | Request expedited review if eligible (true/false). Falls back to regular review if not eligible. | No (default: `false`)   |
+| `crx_private_key`      | CRX signing private key as a PEM string. If provided, the ZIP is signed as a CRX.                | No                      |
+| `crx_private_key_path` | Path to a CRX signing private key PEM file. If provided, the ZIP is signed as a CRX.             | No                      |
 
-> **Note:** Only one of `crx_private_key` or `crx_private_key_path` should be provided. If neither is provided, the extension is uploaded as a ZIP.
+> **Note:** Only one of `crx_private_key` or `crx_private_key_path` should be provided. If neither is provided, the package remains a ZIP. In `sign` mode, the resulting ZIP or CRX is saved as an artifact and is not uploaded to the Chrome Web Store.
 
 ## Outputs
 
@@ -65,7 +66,7 @@ jobs:
         id: publish-chrome-extension
         uses: puzzlers-labs/chrome-webstore-publish@v1
         with:
-          mode: publish # Or `sign` to sign the extension and publish at a later step (manually).
+          mode: publish # Or `sign` to create the package without uploading it.
           extension_id: ${{ vars.CHROME_EXTENSION_ID }}
           zip_file_path: ./dist/extension.zip
           client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
@@ -90,7 +91,7 @@ jobs:
 
 ## Contributions
 
-Refer to [CONTRIBUTING.MD](CONTRIBUTING.MD)
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
