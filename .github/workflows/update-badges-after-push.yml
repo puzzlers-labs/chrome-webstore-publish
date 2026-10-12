@@ -39,7 +39,7 @@ jobs:
 
       # Uploads badge files as artifacts for use in other jobs
       - name: Upload badge artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: badges
           path: |
@@ -113,7 +113,7 @@ jobs:
 
       # Uploads the updated coverage badge as an artifact
       - name: Upload coverage badge
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-badge
@@ -155,7 +155,7 @@ jobs:
 
       # Uploads the updated Docker build badge as an artifact
       - name: Upload docker badge
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: docker-build-badge
@@ -212,7 +212,7 @@ jobs:
 
       # Uploads the updated test badge as an artifact
       - name: Upload test badge
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-status-badge
