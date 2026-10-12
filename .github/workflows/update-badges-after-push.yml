@@ -66,7 +66,7 @@ jobs:
 
       # Sets up Node.js for running tests and coverage
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
@@ -180,7 +180,7 @@ jobs:
 
       # Sets up Node.js for running tests
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
